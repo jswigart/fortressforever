@@ -1966,7 +1966,7 @@ void CBasePlayer::WaterMove()
 
 
 // true if the player is attached to a ladder
-bool CBasePlayer::IsOnLadder( void )
+bool CBasePlayer::IsOnLadder( void ) const
 { 
 	return (GetMoveType() == MOVETYPE_LADDER);
 }
@@ -8088,6 +8088,40 @@ float CBasePlayer::GetStickDist()
 
 	return controlStick.Length();
 }
+
+#if(USE_OMNIBOT)
+bool CBasePlayer::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PLAYER;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE, true );
+	classInfo.mCategory.SetFlag( ENT_CAT_PLAYER, true );
+
+	classInfo.mFlags.SetFlag( ENT_FLAG_VISTEST );
+
+	if ( !IsAlive() || GetHealth() <= 0 || GetTeamNumber() == TEAM_SPECTATOR )
+		classInfo.mFlags.SetFlag( ENT_FLAG_DEAD );
+
+	if ( GetFlags() & FL_DUCKING )
+		classInfo.mFlags.SetFlag( ENT_FLAG_CROUCHED );
+
+	CBaseCombatWeapon *pWpn = GetActiveWeapon();
+	if ( pWpn && pWpn->m_bInReload )
+		classInfo.mFlags.SetFlag( ENT_FLAG_RELOADING );
+
+	if ( IsOnLadder() )
+		classInfo.mFlags.SetFlag( ENT_FLAG_ONLADDER );
+
+	if ( GetFlags() & FL_DUCKING )
+		classInfo.mFlags.SetFlag( ENT_FLAG_CROUCHED );
+
+	if ( !IsBot() )
+		classInfo.mFlags.SetFlag( ENT_FLAG_HUMANCONTROLLED );
+	return true;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 //  CPlayerInfo functions (simple passthroughts to get around the CBasePlayer multiple inheritence limitation)

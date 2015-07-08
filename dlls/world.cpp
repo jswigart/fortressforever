@@ -729,3 +729,17 @@ bool CWorld::IsColdWorld( void )
 {
 	return m_bColdWorld;
 }
+
+#if(USE_OMNIBOT)
+bool CWorld::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_MAP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+
+	return true;
+}
+#endif

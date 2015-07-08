@@ -278,7 +278,7 @@ public:
 	// Bug #0000656: Throwing discards at miniturret will freak it out
 	virtual bool IsPlayer( void ) { return false; }
 	virtual bool BlocksLOS( void ) { return false; }
-	virtual bool IsAlive( void ) { return false; }
+	virtual bool IsAlive( void ) const { return false; }
 
 	virtual Class_T Classify( void ) { return CLASS_BACKPACK; }
 	virtual bool CanClipOwnerEntity( void ) const { return true; }

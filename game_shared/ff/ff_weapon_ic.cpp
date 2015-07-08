@@ -111,8 +111,8 @@ void CFFWeaponIC::Fire()
 	CFFProjectileIncendiaryRocket *pRocket = CFFProjectileIncendiaryRocket::CreateRocket(this, vecSrc, pPlayer->EyeAngles(), pPlayer, pWeaponInfo.m_iDamage, pWeaponInfo.m_iDamageRadius, pWeaponInfo.m_iSpeed);
 	pRocket;
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_NAPALMCANNON, pRocket);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pPlayer, TF_WP_NAPALMCANNON, pRocket);
 #endif
 
 	// Push player but don't add to upwards force

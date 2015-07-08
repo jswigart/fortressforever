@@ -47,6 +47,10 @@ public:
 
 	int UpdateTransmitState() { return FL_EDICT_DONTSEND; }
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	CFFProjectileNail() {}
 	CFFProjectileNail(const CFFProjectileNail&) {}

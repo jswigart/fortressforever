@@ -66,6 +66,10 @@ public:
 
 	// Methods of ICollideable
 	virtual IHandleEntity	*GetEntityHandle();
+
+	virtual const Vector&	BoundsMins( ) const { return m_vecMins; }
+	virtual const Vector&	BoundsMaxs( ) const { return m_vecMaxs; }
+
  	virtual const Vector&	OBBMins( ) const;
 	virtual const Vector&	OBBMaxs( ) const;
 	virtual void			WorldSpaceTriggerBounds( Vector *pVecWorldMins, Vector *pVecWorldMaxs ) const;

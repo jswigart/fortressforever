@@ -449,8 +449,9 @@ void CFFDispenser::Dispense( CFFPlayer *pPlayer )
 	// We can call this over and over, it will only ever reduce one level
 	//if (IsSabotaged())
 	//	pPlayer->ReduceArmorClass();
-
-	Omnibot::Notify_GotDispenserAmmo(pPlayer);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_GotDispenserAmmo(pPlayer);
+#endif
 }
 
 //
@@ -665,3 +666,39 @@ void CFFDispenser::PhysicsSimulate()
 		m_iLastState = iState;
 	}
 }
+
+#if(USE_OMNIBOT)
+bool CFFDispenser::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_BUILDABLE;
+	classInfo.mClassId = TF_CLASSEX_DISPENSER;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+
+	classInfo.mArmor.Set( m_iArmor, 500 );
+	classInfo.mQuantity.Set( m_iAmmoPercent, 100 );
+
+	classInfo.mAmmo1.Set( m_iCells, m_iMaxCells );
+	classInfo.mAmmo2.Set( m_iShells, m_iMaxShells );
+	classInfo.mAmmo2.Set( m_iNails, m_iMaxNails );
+	classInfo.mAmmo4.Set( m_iRockets, m_iMaxRockets );
+	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
+
+	if ( !IsBuilt() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
+	else
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+
+	if ( CanSabotage() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
+
+	if ( IsSabotaged() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+	return true;
+}
+#endif

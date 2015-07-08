@@ -100,8 +100,8 @@ void CFFWeaponRPG::Fire()
 	CFFProjectileRocket *pRocket = CFFProjectileRocket::CreateRocket(this, vecSrc, pPlayer->EyeAngles(), pPlayer, pWeaponInfo.m_iDamage, RPG_DAMAGERADIUS/*pWeaponInfo.m_iDamageRadius*/, pWeaponInfo.m_iSpeed);
 	pRocket;
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_ROCKET_LAUNCHER, pRocket);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pPlayer, TF_WP_ROCKET_LAUNCHER, pRocket);
 #endif
 }
 

@@ -61,6 +61,10 @@ public:
 	virtual void Explode( trace_t *pTrace, int bitsDamageType );
 
 #endif
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED(FFGrenadeMirv, DT_FFGrenadeMirv)
@@ -164,3 +168,15 @@ void CFFGrenadeMirv::Precache()
 	PrecacheModel( MIRVGRENADE_MODEL );
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeMirv::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_MIRV_GRENADE;
+	return true;
+}
+#endif
+

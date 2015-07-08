@@ -3111,7 +3111,9 @@ void CFFPlayer::FindRadioTaggedPlayers( void )
 
 		m_hRadioTagData->Set( pPlayer->entindex(), true, pPlayer->GetClassSlot(), pPlayer->GetTeamNumber(), ( pPlayer->GetFlags() & FL_DUCKING ) ? true : false, vecPlayerOrigin );
 
-		Omnibot::Notify_RadioTagUpdate(this, pPlayer);	
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_RadioTagUpdate(this, pPlayer);
+#endif
 	}
 }
 
@@ -3260,7 +3262,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 		// TODO: need to check where the SG is being built, NOT where player is? - AfterShock
 		if( IsInNoBuild() && ( (m_iWantBuild == FF_BUILD_DISPENSER) || (m_iWantBuild == FF_BUILD_SENTRYGUN) || (m_iWantBuild == FF_BUILD_MANCANNON) ) )
 		{
-			Omnibot::Notify_Build_CantBuild(this, m_iWantBuild);
+#if(USE_OMNIBOT)
+			omnibot_interface::Notify_Build_CantBuild(this, m_iWantBuild);
+#endif
 
 			// Re-initialize
 			m_iCurBuild = FF_BUILD_NONE;
@@ -3290,7 +3294,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 			( (m_iWantBuild == FF_BUILD_DETPACK) && GetDetpack()) ||
 			( (m_iWantBuild == FF_BUILD_MANCANNON) && GetManCannon()) )
 		{
-			Omnibot::Notify_Build_AlreadyBuilt(this, m_iWantBuild);
+#if(USE_OMNIBOT)
+			omnibot_interface::Notify_Build_AlreadyBuilt(this, m_iWantBuild);
+#endif
 
 			switch( m_iWantBuild )
 			{
@@ -3332,7 +3338,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 			( (m_iWantBuild == FF_BUILD_DETPACK) && (GetAmmoCount( AMMO_DETPACK ) < 1 )) ||
 			( (m_iWantBuild == FF_BUILD_MANCANNON) && (GetAmmoCount( AMMO_MANCANNON ) < 1 )) )
 		{
-			Omnibot::Notify_Build_NotEnoughAmmo(this, m_iWantBuild);
+#if(USE_OMNIBOT)
+			omnibot_interface::Notify_Build_NotEnoughAmmo(this, m_iWantBuild);
+#endif
 
 			switch( m_iWantBuild )
 			{
@@ -3354,7 +3362,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 		// See if on ground...
 		if( !FBitSet( GetFlags(), FL_ONGROUND ) )
 		{
-			Omnibot::Notify_Build_MustBeOnGround(this, m_iWantBuild);
+#if(USE_OMNIBOT)
+			omnibot_interface::Notify_Build_MustBeOnGround(this, m_iWantBuild);
+#endif
 
 			ClientPrint( this, HUD_PRINTCENTER, "#FF_BUILDERROR_MUSTBEONGROUND" );
 
@@ -3405,7 +3415,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 					// Leaving the remove armour code in that function as you can't fiddle with armour vals via this exploit -> Defrag
 					RemoveAmmo( 100, AMMO_CELLS );
 
-					Omnibot::Notify_DispenserBuilding(this, pDispenser);
+#if(USE_OMNIBOT)
+					omnibot_interface::Notify_DispenserBuilding(this, pDispenser);
+#endif
 					
 					//m_bStaticBuilding = false; // AfterShock - Uncomment this for testing drop-and-run SGs / Dispensers! (also need SG_BUILDTIME raising)
 				}
@@ -3455,7 +3467,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 					// Moved code to remove cells from CFFSentryGun::GoLive() to here -> Defrag
 					RemoveAmmo( 130, AMMO_CELLS );
 
-					Omnibot::Notify_SentryBuilding(this, pSentryGun);
+#if(USE_OMNIBOT)
+					omnibot_interface::Notify_SentryBuilding(this, pSentryGun);
+#endif
 
 					//m_bStaticBuilding = false; // AfterShock - Uncomment this for testing drop-and-run SGs / Dispensers! (also need SG_BUILDTIME raising)
 				}
@@ -3481,7 +3495,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 					// Set time it takes to build
 					m_flBuildTime = gpGlobals->curtime + 3.0f; // mulch: bug 0000337: build time 3 seconds for detpack
 
-					Omnibot::Notify_DetpackBuilding(this, pDetpack);
+#if(USE_OMNIBOT)
+					omnibot_interface::Notify_DetpackBuilding(this, pDetpack);
+#endif
 				}
 				break;
 
@@ -3496,7 +3512,7 @@ void CFFPlayer::PreBuildGenericThink( void )
 					m_hManCannon = pManCannon;
 					m_flBuildTime = gpGlobals->curtime + 3.5f; // 3.5 seconds to build?
 
-					// TODO: Omnibot::Notify_ManCannonBuilding( this, pManCannon );
+					// TODO: Notify_ManCannonBuilding( this, pManCannon );
 				}
 				break;
 			}
@@ -3537,7 +3553,9 @@ void CFFPlayer::PreBuildGenericThink( void )
 		if( m_iCurBuild == m_iWantBuild )
 		{
 			// DevMsg( "[Building] You're currently building this item so cancel the build.\n" );
-			Omnibot::Notify_Build_BuildCancelled(this,m_iCurBuild);
+#if(USE_OMNIBOT)
+			omnibot_interface::Notify_Build_BuildCancelled(this,m_iCurBuild);
+#endif
 
 			CFFBuildableObject *pBuildable = GetBuildable( m_iCurBuild );
 			
@@ -4369,7 +4387,7 @@ void CFFPlayer::AddSpeedEffect(SpeedEffectType type, float duration, float speed
 	RecalculateSpeed();
 }
 
-bool CFFPlayer::IsSpeedEffectSet( SpeedEffectType type )
+bool CFFPlayer::IsSpeedEffectSet( SpeedEffectType type ) const
 {
 	bool bFound = false;
 
@@ -4679,7 +4697,9 @@ bool CFFPlayer::Infect( CFFPlayer *pInfector )
 		WRITE_FLOAT(999.0f);
 		MessageEnd();
 
-		Omnibot::Notify_Infected(this, pInfector);
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_Infected(this, pInfector);
+#endif
 
 		return true;
 	}
@@ -4727,7 +4747,9 @@ bool CFFPlayer::Cure( CFFPlayer *pCurer )
 		if( pCurer )
 			pCurer->AddFortPoints( 100, "#FF_FORTPOINTS_CUREINFECTION" );
 
-		Omnibot::Notify_Cured(this, pCurer);
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_Cured(this, pCurer);
+#endif
 
 		bCured = true;
 	}
@@ -4802,8 +4824,10 @@ void CFFPlayer::ApplyBurning( CFFPlayer *hIgniter, float scale, float flIconDura
 	if (m_bBurnFlagIC == true) 
 		++newburnlevel;
 	
+#if(USE_OMNIBOT)
 	if(oldburnlevel != newburnlevel)
-		Omnibot::Notify_BurnLevel(this, hIgniter, newburnlevel);
+		omnibot_interface::Notify_BurnLevel(this, hIgniter, newburnlevel);
+#endif
 
 	// each weapons burn damage can only stack once. (else you set them on 999 fire with the FT)
 	/** Uncomment this to use different burn damages depending on the weapon - AfterShock
@@ -5223,10 +5247,10 @@ void CFFPlayer::ThrowGrenade(float fTimer, float flSpeed)
 			pGrenade->m_fIsHandheld = false;
 
 #ifdef GAME_DLL
-		if(m_iGrenadeState == FF_GREN_PRIMEONE)
-			Omnibot::Notify_PlayerShoot(this, Omnibot::TF_WP_GRENADE1, pGrenade);
+		/*if(m_iGrenadeState == FF_GREN_PRIMEONE)
+			Notify_PlayerShoot(this, TF_WP_GRENADE1, pGrenade);
 		else if(m_iGrenadeState == FF_GREN_PRIMETWO)
-			Omnibot::Notify_PlayerShoot(this, Omnibot::TF_WP_GRENADE2, pGrenade);
+			Notify_PlayerShoot(this, TF_WP_GRENADE2, pGrenade);*/
 #endif
 	}
 }
@@ -5734,7 +5758,9 @@ int CFFPlayer::OnTakeDamage_Alive(const CTakeDamageInfo &info)
 		gameeventmanager->FireEvent(pEvent, true);
 	}
 
-	Omnibot::Notify_Hurt(this, attacker);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_Hurt(this, attacker);
+#endif
 
 	return 1;
 }
@@ -6458,8 +6484,9 @@ void CFFPlayer::Command_Disguise()
 	{
 		// TODO: Nice hud msg!
 		//Warning( "[Disguise] Invalid team for this map!\n" );
-
-		Omnibot::Notify_CantDisguiseAsTeam(this, iTeam);
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_CantDisguiseAsTeam(this, iTeam);
+#endif
 		return;
 	}
 
@@ -6467,8 +6494,9 @@ void CFFPlayer::Command_Disguise()
 	{
 		// TODO: Nice hud msg!
 		//Warning( "[Disguise] Invalid class for this map!\n" );
-
-		Omnibot::Notify_CantDisguiseAsClass(this, iClass);
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_CantDisguiseAsClass(this, iClass);
+#endif
 		return;
 	}
 
@@ -6481,7 +6509,9 @@ void CFFPlayer::Command_Disguise()
 
 	// TODO: This should probably pass in iTeam & iClass as
 	// these two functions won't have the right shit yet?
-	Omnibot::Notify_Disguising(this, GetNewDisguisedTeam(), GetNewDisguisedClass());
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_Disguising(this, GetNewDisguisedTeam(), GetNewDisguisedClass());
+#endif
 }
 
 // Server only
@@ -6533,7 +6563,9 @@ void CFFPlayer::ResetDisguise()
 	m_iSpyDisguise = 0;
 	m_iSpyDisguising = 0;
 
-	Omnibot::Notify_DisguiseLost(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_DisguiseLost(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -7997,3 +8029,134 @@ void CFFPlayer::UpdateCamera( bool bUnassigned )
 		}				
 	}
 }
+
+#if(USE_OMNIBOT)
+bool CFFPlayer::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	switch( GetClassSlot() )
+	{
+		case CLASS_SCOUT:
+			classInfo.mClassId = TF_CLASS_SCOUT;
+			break;
+		case CLASS_SNIPER:
+			classInfo.mClassId = TF_CLASS_SNIPER;
+			break;
+		case CLASS_SOLDIER:
+			classInfo.mClassId = TF_CLASS_SOLDIER;
+			break;
+		case CLASS_DEMOMAN:
+			classInfo.mClassId = TF_CLASS_DEMOMAN;
+			break;
+		case CLASS_MEDIC:
+			classInfo.mClassId = TF_CLASS_MEDIC;
+			break;
+		case CLASS_HWGUY:
+			classInfo.mClassId = TF_CLASS_HWGUY;
+			break;
+		case CLASS_PYRO:
+			classInfo.mClassId = TF_CLASS_PYRO;
+			break;
+		case CLASS_SPY:
+			classInfo.mClassId = TF_CLASS_SPY;
+			break;
+		case CLASS_ENGINEER:
+			classInfo.mClassId = TF_CLASS_ENGINEER;
+			break;
+		case CLASS_CIVILIAN:
+			classInfo.mClassId = TF_CLASS_CIVILIAN;
+			break;
+	}
+
+	if ( IsCloaked() )
+		classInfo.mPowerUps.SetFlag( TF_PWR_CLOAKED );
+
+	switch ( GetDisguisedTeam() )
+	{
+	case TEAM_BLUE:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_BLUE );
+		break;
+	case TEAM_RED:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_RED );
+		break;
+	case TEAM_YELLOW:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_YELLOW );
+		break;
+	case TEAM_GREEN:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_GREEN );
+		break;
+	}
+	switch ( GetDisguisedClass() )
+	{
+	case CLASS_SCOUT:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_SCOUT );
+		break;
+	case CLASS_SNIPER:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_SNIPER );
+		break;
+	case CLASS_SOLDIER:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_SOLDIER );
+		break;
+	case CLASS_DEMOMAN:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_DEMOMAN );
+		break;
+	case CLASS_MEDIC:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_MEDIC );
+		break;
+	case CLASS_HWGUY:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_HWGUY );
+		break;
+	case CLASS_PYRO:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_PYRO );
+		break;
+	case CLASS_SPY:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_SPY );
+		break;
+	case CLASS_ENGINEER:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_ENGINEER );
+		break;
+	case CLASS_CIVILIAN:
+		classInfo.mPowerUps.SetFlag( TF_PWR_DISGUISE_CIVILIAN );
+		break;
+	}
+	
+	if ( IsSpeedEffectSet( SE_SNIPERRIFLE ) )
+		classInfo.mFlags.SetFlag( ENT_FLAG_IRONSIGHT );
+	if ( IsSpeedEffectSet( SE_ASSAULTCANNON ) )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_ASSAULTFIRING );
+	if ( IsRadioTagged() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_RADIOTAGGED );
+	if ( m_hSabotaging )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGING );
+
+	if ( IsInfected() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_INFECTED );
+	if ( IsBurning() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BURNING );
+	if ( IsSpeedEffectSet( SE_LEGSHOT ) )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_LEGSHOT );
+	if ( IsSpeedEffectSet( SE_TRANQ ) )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_TRANQED );
+	if ( IsGassed() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_GASSED );
+
+	if ( IsBuilding() )
+	{
+		switch ( GetCurrentBuild() )
+		{
+		case FF_BUILD_DISPENSER:
+			classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDING_DISP );
+			break;
+		case FF_BUILD_SENTRYGUN:
+			classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDING_SG );
+			break;
+		case FF_BUILD_DETPACK:
+			classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDING_DETP );
+			break;
+		}
+	}
+
+	return true;
+}
+#endif

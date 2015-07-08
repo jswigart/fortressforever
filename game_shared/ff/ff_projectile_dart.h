@@ -51,6 +51,10 @@ public:
 	virtual void Spawn();
 #endif
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 protected:
 
 private:	

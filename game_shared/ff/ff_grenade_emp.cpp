@@ -208,3 +208,14 @@ void CFFGrenadeEmp::Precache()
 
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeEmp::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_EMP_GRENADE;
+	return true;
+}
+#endif

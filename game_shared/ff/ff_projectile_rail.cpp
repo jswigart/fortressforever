@@ -646,3 +646,14 @@ void CFFProjectileRail::ClientThink( void )
 
 //  ^  CLIENT_DLL  ^
 #endif
+
+#if(USE_OMNIBOT)
+bool CFFProjectileRail::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_RAIL;
+	return true;
+}
+#endif

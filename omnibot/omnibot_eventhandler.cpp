@@ -13,8 +13,6 @@ KeyValues *g_pModEvents = NULL;
 
 ConVar g_BotShowEvents( "omnibot_showevents", "", 0, "Echo Recieved Events to console." );
 
-using namespace Omnibot;
-
 omnibot_eventhandler *g_pEventHandler = NULL;
 
 typedef void (*pfnEventCallback)(IGameEvent *_event);
@@ -32,8 +30,6 @@ void event_ServerPlayerInfo(IGameEvent *_event);
 void event_ServerPlayerActivate(IGameEvent *_event);
 void event_ServerPlayerSay(IGameEvent *_event);
 void event_ServerPlayerSayTeam(IGameEvent *_event);
-void event_ServerPlayerAddItem(IGameEvent *_event);
-void event_ServerPlayerRemoveItem(IGameEvent *_event);
 
 void event_GameTeamInfo(IGameEvent *_event);
 void event_GameTeamScore(IGameEvent *_event);
@@ -51,8 +47,6 @@ void event_BreakBreakable(IGameEvent *_event);
 void event_BreakProp(IGameEvent *_event);
 void event_Class(IGameEvent *_event);
 void event_Team(IGameEvent *_event);
-void event_Hurt(IGameEvent *_event);
-void event_Death(IGameEvent *_event);
 void event_Spawn(IGameEvent *_event);
 void event_SentryBuilt(IGameEvent *_event);
 void event_DispenserBuilt(IGameEvent *_event);
@@ -83,8 +77,6 @@ const EventCallback EVENT_CALLBACKS[] =
 	{ "player_activate", event_ServerPlayerActivate },
 	{ "player_say", event_ServerPlayerSay },
 	{ "player_sayteam", event_ServerPlayerSayTeam },
-	{ "player_additem", event_ServerPlayerAddItem },
-	{ "player_removeitem", event_ServerPlayerRemoveItem },
 	
 	// Game Events
 	{ "team_info", event_GameTeamInfo },
@@ -105,8 +97,6 @@ const EventCallback EVENT_CALLBACKS[] =
 	// Mod Events
 	{ "player_changeclass", event_Class },
 	{ "player_team", event_Team },
-	//{ "player_hurt", event_Hurt },
-	//{ "player_death", event_Death },
 	//{ "player_spawn", event_Spawn },
 	{ "build_dispenser", event_DispenserBuilt },
 	{ "build_sentrygun", event_SentryBuilt },
@@ -355,7 +345,7 @@ void event_ServerPlayerConnect(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_ClientConnected(pPlayer, _event->GetBool("bot"));
+		omnibot_interface::Notify_ClientConnected(pPlayer, _event->GetBool("bot"));
 	}
 }
 
@@ -364,7 +354,7 @@ void event_ServerPlayerDisConnect(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_ClientDisConnected(pPlayer);
+		omnibot_interface::Notify_ClientDisConnected(pPlayer);
 	}
 }
 
@@ -385,7 +375,7 @@ void event_ServerPlayerSay(IGameEvent *_event)
 	{
 		const char *pMsg = _event->GetString("text", "");
 		if(pMsg)
-			Omnibot::Notify_ChatMsg(pPlayer, pMsg);
+			omnibot_interface::Notify_ChatMsg(pPlayer, pMsg);
 	}
 }
 
@@ -396,38 +386,7 @@ void event_ServerPlayerSayTeam(IGameEvent *_event)
 	{
 		const char *pMsg = _event->GetString("text", "");
 		if(pMsg)
-			Omnibot::Notify_TeamChatMsg(pPlayer, pMsg);
-	}
-}
-
-void event_ServerPlayerAddItem(IGameEvent *_event)
-{
-	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-	if(pPlayer)
-	{
-		const char *pItemName = _event->GetString("item", "");
-		if(pItemName)
-			Omnibot::Notify_AddWeapon(pPlayer, pItemName);
-	}
-}
-
-void event_ServerPlayerRemoveItem(IGameEvent *_event)
-{
-	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-	if(pPlayer)
-	{
-		const char *pItemName = _event->GetString("item", "");
-		if(pItemName)
-			Omnibot::Notify_RemoveWeapon(pPlayer, pItemName);
-	}
-}
-
-void event_ServerPlayerRemoveAllItems(IGameEvent *_event)
-{
-	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-	if(pPlayer)
-	{
-		Omnibot::Notify_RemoveAllItems(pPlayer);
+			omnibot_interface::Notify_TeamChatMsg(pPlayer, pMsg);
 	}
 }
 
@@ -451,7 +410,7 @@ void event_GamePlayerScore(IGameEvent *_event)
 //	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 //	if(pPlayer)
 //	{
-//		Omnibot::Notify_PlayerShoot(pPlayer, _event->GetInt("weapon"), 0);
+//		Notify_PlayerShoot(pPlayer, _event->GetInt("weapon"), 0);
 //	}
 //}
 
@@ -461,7 +420,7 @@ void event_GamePlayerUse(IGameEvent *_event)
 	CBaseEntity *pUsedEnt = CBaseEntity::Instance(_event->GetInt("entity"));
 	if(pPlayer && pUsedEnt)
 	{
-		Omnibot::Notify_PlayerUsed(pPlayer, pUsedEnt);
+		omnibot_interface::Notify_PlayerUsed(pPlayer, pUsedEnt);
 	}
 }
 
@@ -477,13 +436,13 @@ void event_GameNewMap(IGameEvent *_event)
 
 void event_GameStart(IGameEvent *_event)
 {
-	Omnibot::Notify_GameStarted();
+	omnibot_interface::Notify_GameStarted();
 }
 
 void event_GameEnd(IGameEvent *_event)
 {
 	int iWinner = _event->GetInt("winner");
-	Omnibot::Notify_GameEnded(obUtilGetBotTeamFromGameTeam(iWinner));
+	omnibot_interface::Notify_GameEnded( iWinner );
 }
 
 void event_RoundStart(IGameEvent *_event)
@@ -516,7 +475,7 @@ void event_Class(IGameEvent *_event)
 	/*CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_ChangedClass(pPlayer, _event->GetInt("oldclass"), _event->GetInt("newclass"));
+		Notify_ChangedClass(pPlayer, _event->GetInt("oldclass"), _event->GetInt("newclass"));
 	}*/
 }
 
@@ -525,44 +484,9 @@ void event_Team(IGameEvent *_event)
 	/*CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_ChangedTeam(pPlayer, _event->GetInt("team"));
+		Notify_ChangedTeam(pPlayer, _event->GetInt("team"));
 	}*/
 }
-
-void event_Hurt(IGameEvent *_event)
-{
-	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-	CBasePlayer *pAttacker = UTIL_PlayerByUserId(_event->GetInt("attacker")); // FIXME
-	if(pPlayer)
-	{
-		Omnibot::Notify_Hurt(pPlayer, pAttacker ? pAttacker : 0);
-	}	
-}
-
-void event_Death(IGameEvent *_event)
-{
-	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-	CBasePlayer *pAttacker = UTIL_PlayerByUserId(_event->GetInt("attacker")); // FIXME
-	const char *pWeapon = _event->GetString("weapon");
-	if(pPlayer)
-	{
-		Omnibot::Notify_Death(pPlayer, pAttacker ? pAttacker : 0, pWeapon);
-	}
-	if(pAttacker)
-	{
-		Omnibot::Notify_KilledSomeone(pAttacker, pPlayer ? pPlayer : 0, pWeapon);
-	}
-}
-
-//void event_Spawn(IGameEvent *_event)
-//{
-//	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
-//	if(pPlayer)
-//	{
-//		Omnibot::Notify_Spawned(pPlayer);
-//	}
-//}
-
 void event_SentryBuilt(IGameEvent *_event)
 {
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
@@ -573,7 +497,7 @@ void event_SentryBuilt(IGameEvent *_event)
 		CFFSentryGun *pBuildable = pFFPlayer->GetSentryGun();
 		if(pBuildable)
 		{
-			Omnibot::Notify_SentryBuilt(pPlayer, pBuildable);			
+			omnibot_interface::Notify_SentryBuilt(pPlayer, pBuildable);			
 		}
 	}
 }
@@ -588,7 +512,7 @@ void event_DispenserBuilt(IGameEvent *_event)
 		CFFDispenser *pBuildable = pFFPlayer->GetDispenser();
 		if(pBuildable)
 		{
-			Omnibot::Notify_DispenserBuilt(pPlayer, pBuildable);
+			omnibot_interface::Notify_DispenserBuilt(pPlayer, pBuildable);
 		}
 	}
 }
@@ -603,7 +527,7 @@ void event_DetpackBuilt(IGameEvent *_event)
 		CFFDetpack *pBuildable = pFFPlayer->GetDetpack();
 		if(pBuildable)
 		{
-			Omnibot::Notify_DetpackBuilt(pPlayer, pBuildable);
+			omnibot_interface::Notify_DetpackBuilt(pPlayer, pBuildable);
 		}
 	}
 }
@@ -614,7 +538,7 @@ void event_SentryKilled(IGameEvent *_event)
 	CBasePlayer *pAttacker = UTIL_PlayerByUserId(_event->GetInt("attacker"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_SentryDestroyed(pPlayer, pAttacker ? pAttacker : 0);
+		omnibot_interface::Notify_SentryDestroyed(pPlayer, pAttacker ? pAttacker : 0);
 	}
 }
 
@@ -625,7 +549,7 @@ void event_DispenserKilled(IGameEvent *_event)
 
 	if(pPlayer)
 	{
-		Omnibot::Notify_DispenserDestroyed(pPlayer, pAttacker ? pAttacker : 0);	
+		omnibot_interface::Notify_DispenserDestroyed(pPlayer, pAttacker ? pAttacker : 0);	
 	}
 }
 
@@ -634,7 +558,7 @@ void event_SentryUpgraded(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_SentryUpgraded(pPlayer, _event->GetInt("level"));	
+		omnibot_interface::Notify_SentryUpgraded(pPlayer, _event->GetInt("level"));	
 	}
 }
 
@@ -643,7 +567,7 @@ void event_DisguiseFinished(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_Disguising(pPlayer, _event->GetInt("team"), _event->GetInt("class"));
+		omnibot_interface::Notify_Disguising(pPlayer, _event->GetInt("team"), _event->GetInt("class"));
 	}
 }
 
@@ -652,7 +576,7 @@ void event_DisguiseLost(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_DisguiseLost(pPlayer);
+		omnibot_interface::Notify_DisguiseLost(pPlayer);
 	}
 }
 
@@ -661,7 +585,7 @@ void event_SpyUnCloaked(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_UnCloaked(pPlayer);
+		omnibot_interface::Notify_UnCloaked(pPlayer);
 	}
 }
 
@@ -670,7 +594,7 @@ void event_SpyCloaked(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_Cloaked(pPlayer);
+		omnibot_interface::Notify_Cloaked(pPlayer);
 	}
 }
 
@@ -680,7 +604,7 @@ void event_DispenserEnemyUsed(IGameEvent *_event)
 	CBasePlayer *pEnemy = UTIL_PlayerByUserId(_event->GetInt("enemyid"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_DispenserEnemyUsed(pPlayer, pEnemy ? pEnemy : 0);
+		omnibot_interface::Notify_DispenserEnemyUsed(pPlayer, pEnemy ? pEnemy : 0);
 	}
 }
 
@@ -690,7 +614,7 @@ void event_DispenserSabotaged(IGameEvent *_event)
 	CBasePlayer *pEnemy = UTIL_PlayerByUserId(_event->GetInt("saboteur"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_DispenserSabotaged(pPlayer, pEnemy ? pEnemy : 0);
+		omnibot_interface::Notify_DispenserSabotaged(pPlayer, pEnemy ? pEnemy : 0);
 	}
 }
 
@@ -700,7 +624,7 @@ void event_SentrySabotaged(IGameEvent *_event)
 	CBasePlayer *pEnemy = UTIL_PlayerByUserId(_event->GetInt("saboteur"));
 	if(pPlayer)
 	{
-		Omnibot::Notify_SentrySabotaged(pPlayer, pEnemy ? pEnemy : 0);
+		omnibot_interface::Notify_SentrySabotaged(pPlayer, pEnemy ? pEnemy : 0);
 	}
 }
 
@@ -709,7 +633,7 @@ void event_DispenserDetonated(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));	
 	if(pPlayer)
 	{
-		Omnibot::Notify_DispenserDetonated(pPlayer);
+		omnibot_interface::Notify_DispenserDetonated(pPlayer);
 	}
 }
 
@@ -718,7 +642,7 @@ void event_DispenserDismantled(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));	
 	if(pPlayer)
 	{
-		Omnibot::Notify_DispenserDismantled(pPlayer);
+		omnibot_interface::Notify_DispenserDismantled(pPlayer);
 	}
 }
 
@@ -727,7 +651,7 @@ void event_SentryDetonated(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));	
 	if(pPlayer)
 	{
-		Omnibot::Notify_SentryDetonated(pPlayer);
+		omnibot_interface::Notify_SentryDetonated(pPlayer);
 	}
 }
 
@@ -736,7 +660,7 @@ void event_SentryDismantled(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));	
 	if(pPlayer)
 	{
-		Omnibot::Notify_SentryDismantled(pPlayer);
+		omnibot_interface::Notify_SentryDismantled(pPlayer);
 	}
 }
 
@@ -745,6 +669,6 @@ void event_DetpackDetonated(IGameEvent *_event)
 	CBasePlayer *pPlayer = UTIL_PlayerByUserId(_event->GetInt("userid"));	
 	if(pPlayer)
 	{
-		Omnibot::Notify_DetpackDetonated(pPlayer);
+		omnibot_interface::Notify_DetpackDetonated(pPlayer);
 	}
 }

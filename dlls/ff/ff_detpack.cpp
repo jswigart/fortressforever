@@ -555,3 +555,24 @@ void CFFDetpack::DoExplosionDamage( void )
 		}
 	}
 }
+
+#if(USE_OMNIBOT)
+bool CFFDetpack::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_BUILDABLE;
+	classInfo.mClassId = TF_CLASSEX_DETPACK;
+
+	if ( !IsBuilt() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
+
+	if ( CanSabotage() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
+
+	if ( IsSabotaged() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+	return true;
+}
+#endif
+

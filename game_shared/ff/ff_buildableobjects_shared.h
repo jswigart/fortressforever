@@ -248,7 +248,7 @@ public:
 	CFFBuildableObject();
 	virtual ~CFFBuildableObject();
 	
-	virtual bool IsAlive( void ) { return true; }
+	virtual bool IsAlive( void ) const { return true; }
 	virtual bool IsPlayer( void ) const { return false; }
 	virtual bool BlocksLOS( void ) { return true; }
 	virtual int	BloodColor( void ) { return BLOOD_COLOR_MECH; } // |-- Mirv: Don't bleed
@@ -463,6 +463,10 @@ public:
 	virtual Class_T Classify( void ) { return CLASS_DETPACK; }
 	// <-- shared
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	virtual void OnDataChanged( DataUpdateType_t updateType );
 
@@ -513,6 +517,9 @@ public:
 
 	virtual Class_T Classify( void ) { return CLASS_DISPENSER; }
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 public:
 	// Network variables
@@ -647,6 +654,10 @@ public:
 
 	int GetLevel( void ) const { return m_iLevel; }
 	bool Upgrade();
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 #ifdef GAME_DLL
 	void Repair( int iCells = 0 );
@@ -861,6 +872,10 @@ public:
 
 	virtual Class_T Classify( void ) { return CLASS_MANCANNON; }
 	// <-- shared
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 #ifdef CLIENT_DLL
 	virtual void OnDataChanged( DataUpdateType_t updateType );

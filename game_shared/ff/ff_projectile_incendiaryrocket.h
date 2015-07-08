@@ -48,6 +48,10 @@ public:
 
 	void ArcThink();
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 
 #else

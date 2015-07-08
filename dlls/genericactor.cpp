@@ -199,7 +199,7 @@ public:
 	virtual void ProcessSceneEvents( void );
 
 	// Don't treat as a live target
-	//virtual bool IsAlive( void ) { return FALSE; }
+	//virtual bool IsAlive( void ) const { return FALSE; }
 
 	float m_flextime;
 	int m_flexnum;

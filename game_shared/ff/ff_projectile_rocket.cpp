@@ -341,3 +341,13 @@ CFFProjectileRocket * CFFProjectileRocket::CreateRocket(const CBaseEntity *pSour
 	return pRocket; 
 }
 
+#if(USE_OMNIBOT)
+bool CFFProjectileRocket::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_ROCKET;
+	return true;
+}
+#endif

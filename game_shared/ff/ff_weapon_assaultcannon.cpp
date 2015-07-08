@@ -334,8 +334,8 @@ void CFFWeaponAssaultCannon::Fire()
 
 	pPlayer->FireBullets(info);
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_MINIGUN, 0);
+#if(USE_OMNIBOT)
+	Notify_PlayerShoot(pPlayer, TF_WP_MINIGUN, 0);
 #endif
 }*/
 

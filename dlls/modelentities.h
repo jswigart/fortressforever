@@ -55,6 +55,10 @@ public:
 	DECLARE_DATADESC();
 
 	virtual bool IsOn( void );
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 

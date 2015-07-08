@@ -56,6 +56,10 @@ public:
 
 	virtual bool ExplodeOnHitPlayer() { return true; }
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	CFFProjectileGrenade() {}
 	CFFProjectileGrenade(const CFFProjectileGrenade&) {}

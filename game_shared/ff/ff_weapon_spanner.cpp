@@ -143,9 +143,12 @@ void CFFWeaponSpanner::Hit(trace_t &traceHit, Activity nHitActivity)
 				// Leaving the 'last damage from enemy' part out until discussion has finished about it.
 				pPlayer->AddFortPoints( ( iArmorGiven*0.5 ), "#FF_FORTPOINTS_GIVEARMOR");
 
+#if(USE_OMNIBOT)
 				const int iAfterArmor = pHitPlayer->GetArmor();
-				Omnibot::Notify_GotSpannerArmor(pHitPlayer,pPlayer,iBeforeArmor,iAfterArmor);
-				Omnibot::Notify_GaveSpannerArmor(pPlayer,pHitPlayer,iBeforeArmor,iAfterArmor);
+				omnibot_interface::Notify_GotSpannerArmor(pHitPlayer,pPlayer,iBeforeArmor,iAfterArmor);
+				omnibot_interface::Notify_GaveSpannerArmor(pPlayer,pHitPlayer,iBeforeArmor,iAfterArmor);
+#endif
+
 #endif
 			}
 

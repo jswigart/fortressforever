@@ -52,6 +52,10 @@ public:
 
 	bool IsColdWorld( void );
 
+#if(USE_OMNIBOT)
+	virtual bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 private:
 	DECLARE_DATADESC();
 

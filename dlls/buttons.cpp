@@ -710,7 +710,7 @@ void CBaseButton::ButtonActivate( void )
 		// Omnibot notification
 		const char *n = GetName();
 		if(!n) n = UTIL_VarArgs("button_%d",entindex());
-		Omnibot::omnibot_interface::Trigger(this,m_hActivator.Get(),n,"button_activate");
+		omnibot_interface::Trigger(this,m_hActivator.Get(),n,"button_activate");
 	}
 }
 
@@ -823,7 +823,7 @@ void CBaseButton::ButtonBackHome( void )
 		// Omnibot notification
 		const char *n = GetName();
 		if(!n) n = UTIL_VarArgs("button_%d",entindex());
-		Omnibot::omnibot_interface::Trigger(this,NULL,n,"button_reset");
+		omnibot_interface::Trigger(this,NULL,n,"button_reset");
 	}
 }
 

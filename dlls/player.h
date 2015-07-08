@@ -356,7 +356,7 @@ public:
 	// Player is moved across the transition by other means
 	virtual int				ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	virtual void			Precache( void );
-	bool					IsOnLadder( void );
+	bool					IsOnLadder( void ) const;
 	virtual void			ExitLadder() {}
 
 	virtual int				FlashlightIsOn( void ) { return false; }
@@ -516,6 +516,10 @@ public:
 	const char *GetLastKnownPlaceName( void ) const	{ return m_szLastPlaceName; }	// return the last nav place name the player occupied
 
 	virtual void			CheckChatText( char *p, int bufsize ) {}
+
+#if(USE_OMNIBOT)
+	virtual bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 public:
 	// Player Physics Shadow

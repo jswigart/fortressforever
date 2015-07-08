@@ -1,20 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////
-// 
-// $LastChangedBy: drevil $
-// $LastChangedDate: 2008-03-27 21:34:02 -0700 (Thu, 27 Mar 2008) $
-// $LastChangedRevision: 2531 $
+//
+// $LastChangedBy$
+// $LastChangedDate$
+// $LastChangedRevision$
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #ifndef __FF_EVENTS_H__
 #define __FF_EVENTS_H__
 
 #include "TF_Config.h"
 
-#include "Omni-Bot_Types.h"
-#include "Omni-Bot_Events.h"
-
-typedef enum eFF_Version
+enum FF_Version
 {
 	FF_VERSION_0_1 = 1,
 	FF_VERSION_0_2,
@@ -35,8 +34,9 @@ typedef enum eFF_Version
 	FF_VERSION_0_17,
 	FF_VERSION_0_18,
 	FF_VERSION_0_19,
+	FF_VERSION_0_20,
 	FF_VERSION_LAST,
 	FF_VERSION_LATEST = FF_VERSION_LAST - 1
-} FF_Version;
+};
 
 #endif

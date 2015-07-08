@@ -6615,3 +6615,30 @@ void CBaseEntity::StopTrail()
 }
 
 static ConCommand ent_create("ent_create", CC_Ent_Create, "Creates an entity of the given type where the player is looking.", FCVAR_GAMEDLL | FCVAR_CHEAT);
+
+#if(USE_OMNIBOT)
+bool CBaseEntity::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	if ( IsEffectActive( EF_NODRAW ) )
+		classInfo.mFlags.SetFlag( ENT_FLAG_DISABLED, true );
+
+	const int waterLevel = GetWaterLevel();
+	if ( waterLevel == 3 )
+		classInfo.mFlags.SetFlag( ENT_FLAG_UNDERWATER );
+	else if ( waterLevel >= 2 )
+		classInfo.mFlags.SetFlag( ENT_FLAG_INWATER );
+
+	if ( GetFlags() & FL_ONGROUND )
+		classInfo.mFlags.SetFlag( ENT_FLAG_ONGROUND );
+
+	classInfo.mHealth.Set( GetHealth(), GetMaxHealth() );
+
+	if ( VPhysicsGetObject() )
+	{
+		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+			classInfo.mFlags.SetFlag( ENT_FLAG_HELDBYPLAYER );
+	}
+
+	return false;
+}
+#endif

@@ -507,7 +507,7 @@ void CFFWeaponMeleeBase::Swing()
 	lagcompensation->FinishLagCompensation(pOwner);
 #endif
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pOwner, Omnibot::obUtilGetBotWeaponFromGameWeapon(GetWeaponID()), 0);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pOwner, GetWeaponID(), 0);
 #endif
 }

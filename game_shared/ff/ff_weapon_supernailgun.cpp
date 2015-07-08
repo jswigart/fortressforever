@@ -90,8 +90,8 @@ void CFFWeaponSuperNailgun::Fire()
 	CFFProjectileNail *pNail = CFFProjectileNail::CreateNail(this, vecSrc, pPlayer->EyeAngles(), pPlayer, pWeaponInfo.m_iDamage, pWeaponInfo.m_iSpeed);
 	pNail;
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_SUPERNAILGUN, pNail);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pPlayer, TF_WP_SUPERNAILGUN, pNail);
 #endif
 
 }

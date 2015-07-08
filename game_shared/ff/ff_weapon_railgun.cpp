@@ -370,7 +370,6 @@ void CFFWeaponRailgun::Fire( void )
 
 	const int iDamageRadius = 100;
 	CFFProjectileRail *pRail = CFFProjectileRail::CreateRail( this, vecSrc, pPlayer->EyeAngles(), pPlayer, flDamage, iDamageRadius, flSpeed, flClampedChargeTime );	
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_RAILGUN, pRail);
 
 	// play a different sound for a fully charged shot
 	if ( flClampedChargeTime < RAILGUN_MAXCHARGETIME )
@@ -381,6 +380,10 @@ void CFFWeaponRailgun::Fire( void )
 	// stop the rev sound immediately
 	StopRevSound();
 	
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pPlayer, TF_WP_RAILGUN, pRail);
+#endif
+
 #endif
 
 }

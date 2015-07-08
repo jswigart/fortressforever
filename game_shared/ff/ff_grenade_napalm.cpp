@@ -73,6 +73,10 @@ public:
 	void SmokeThink(void);
 	SmokeTrail *m_pSmokeTrail;
 #endif
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 #ifdef GAME_DLL
@@ -417,3 +421,15 @@ void CFFGrenadeNapalm::Precache()
 	PrecacheModel( NAPALMGRENADE_MODEL );
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeNapalm::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_NAPALM_GRENADE;
+	return true;
+}
+#endif
+

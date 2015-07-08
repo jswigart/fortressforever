@@ -186,6 +186,10 @@ public:
 	// Tracks our ragdoll entity.
 	CNetworkHandle( CBaseEntity, m_hRagdoll );	// networked entity handle 
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 // In shared code.
 public:
 	// IFFPlayerAnimState overrides.
@@ -511,7 +515,7 @@ public:
 	void ReloadClips( void );
  
 	void AddSpeedEffect(SpeedEffectType type, float duration, float speed, int mod = 0, int iIcon = -1, float flIconDuration = -1, bool bLuaAdded = false);
-	bool IsSpeedEffectSet( SpeedEffectType type );
+	bool IsSpeedEffectSet( SpeedEffectType type ) const;
 	void RemoveSpeedEffect(SpeedEffectType type, bool bLuaAdded = false);
 	int	ClearSpeedEffects(int mod = 0);
 protected:

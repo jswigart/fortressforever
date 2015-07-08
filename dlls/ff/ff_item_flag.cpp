@@ -139,7 +139,7 @@ CFFInfoScript::CFFInfoScript( void )
 
 	// bot info
 	m_BotTeamFlags = 0;
-	m_BotGoalType = Omnibot::kNone;
+	m_BotGoalType = omnibot_interface::kNone;
 }
 
 //-----------------------------------------------------------------------------
@@ -692,7 +692,9 @@ void CFFInfoScript::Pickup( CBaseEntity *pEntity )
 
 	PlayCarriedAnim();
 
-	Omnibot::Notify_ItemPickedUp(this, pEntity);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemPickedUp(this, pEntity);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -743,7 +745,9 @@ void CFFInfoScript::OnRespawn( void )
 
 	PlayReturnedAnim();
 
-	Omnibot::Notify_ItemRespawned(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemRespawned(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -874,7 +878,9 @@ void CFFInfoScript::Drop( float delay, Vector pos, Vector velocity )
 	_scriptman.RunPredicates_LUA( this, &hObject, "ondrop" );
 	_scriptman.RunPredicates_LUA( this, &hObject, "onloseitem" );
 
-	Omnibot::Notify_ItemDropped(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemDropped(this);
+#endif
 }
 
 void CFFInfoScript::Drop( float delay, float speed )
@@ -945,7 +951,9 @@ void CFFInfoScript::Return( void )
 
 	PlayReturnedAnim();
 
-	Omnibot::Notify_ItemReturned(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemReturned(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1172,7 +1180,9 @@ void CFFInfoScript::LUA_Remove( void )
 
 	SetRemoved();
 
-	Omnibot::Notify_ItemRemove(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemRemove(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1194,7 +1204,9 @@ void CFFInfoScript::LUA_Restore( void )
 	// Respawn the item back at it's starting spot
 	Respawn( 0.0f );
 
-	Omnibot::Notify_ItemRestore(this);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_ItemRestore(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1213,21 +1225,18 @@ void CFFInfoScript::SetBotGoalInfo(int _type)
 {
 	m_BotGoalType = _type;
 	m_BotTeamFlags = 0;
-	if(m_allowTouchFlags & kAllowBlueTeam && !(m_disallowTouchFlags & kAllowBlueTeam))
-		m_BotTeamFlags |= (1<<Omnibot::TF_TEAM_BLUE);
-	if(m_allowTouchFlags & kAllowRedTeam && !(m_disallowTouchFlags & kAllowRedTeam))
-		m_BotTeamFlags |= (1<<Omnibot::TF_TEAM_RED);
-	if(m_allowTouchFlags & kAllowYellowTeam && !(m_disallowTouchFlags & kAllowYellowTeam))
-		m_BotTeamFlags |= (1<<Omnibot::TF_TEAM_YELLOW);
-	if(m_allowTouchFlags & kAllowGreenTeam && !(m_disallowTouchFlags & kAllowGreenTeam))
-		m_BotTeamFlags |= (1<<Omnibot::TF_TEAM_GREEN);
-	// FF TODO: Sorry DrEvil, I'm too tired right now to add the class touch flags as well. - Jon
-	Omnibot::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
-}
 
-void CFFInfoScript::SpawnBot(const char *_name, int _team, int _class)
-{
-	Omnibot::SpawnBotAsync(_name, _team, _class, this);
+	if(m_allowTouchFlags & kAllowBlueTeam && !(m_disallowTouchFlags & kAllowBlueTeam))
+		m_BotTeamFlags |= (1<<TF_TEAM_BLUE);
+	if(m_allowTouchFlags & kAllowRedTeam && !(m_disallowTouchFlags & kAllowRedTeam))
+		m_BotTeamFlags |= (1<<TF_TEAM_RED);
+	if(m_allowTouchFlags & kAllowYellowTeam && !(m_disallowTouchFlags & kAllowYellowTeam))
+		m_BotTeamFlags |= (1<<TF_TEAM_YELLOW);
+	if(m_allowTouchFlags & kAllowGreenTeam && !(m_disallowTouchFlags & kAllowGreenTeam))
+		m_BotTeamFlags |= (1<<TF_TEAM_GREEN);
+
+	// FF TODO: Sorry DrEvil, I'm too tired right now to add the class touch flags as well. - Jon
+	omnibot_interface::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
 }
 
 //-----------------------------------------------------------------------------
@@ -1379,3 +1388,52 @@ void CFFInfoScript::PhysicsSimulate()
 	if (VISUALIZE_INFOSCRIPT_SIZES)
 		DrawBBoxOverlay();
 }
+
+#if(USE_OMNIBOT)
+bool CFFInfoScript::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	switch( m_BotGoalType )
+	{
+	case omnibot_interface::kNone:
+		return false;
+	case omnibot_interface::kBackPack_Ammo:
+		classInfo.mGroup = ENT_GRP_AMMO1;
+		break;
+	case omnibot_interface::kBackPack_Armor:
+		classInfo.mGroup = ENT_GRP_ARMOR;
+		break;
+	case omnibot_interface::kBackPack_Health:
+		classInfo.mGroup = ENT_GRP_HEALTH;
+		break;
+	case omnibot_interface::kBackPack_Grenades:
+		break;
+	case omnibot_interface::kFlag:
+		classInfo.mGroup = ENT_GRP_FLAG;
+		break;
+	case omnibot_interface::kFlagCap:
+		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
+		break;
+	case omnibot_interface::kHuntedEscape:
+		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
+		break;
+	case omnibot_interface::kTrainerSpawn:
+		return false;
+	}
+	
+	if ( m_BotTeamFlags != 0 )
+	{
+		if ( m_BotTeamFlags & (1<<TF_TEAM_BLUE) )
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
+		if ( m_BotTeamFlags & (1<<TF_TEAM_RED) )
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
+		if ( m_BotTeamFlags & (1<<TF_TEAM_YELLOW) )
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
+		if ( m_BotTeamFlags & (1<<TF_TEAM_GREEN) )
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
+	}
+
+	return true;
+}
+#endif

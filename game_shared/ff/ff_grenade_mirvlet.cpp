@@ -40,6 +40,11 @@ public:
 #else
 	virtual void Spawn();
 #endif
+
+	
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED(FFGrenadeMirvlet, DT_FFGrenadeMirvlet)
@@ -81,3 +86,15 @@ void CFFGrenadeMirvlet::Precache()
 	PrecacheModel( MIRVLET_MODEL );
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeMirvlet::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_MIRVLET_GRENADE;
+	return true;
+}
+#endif
+

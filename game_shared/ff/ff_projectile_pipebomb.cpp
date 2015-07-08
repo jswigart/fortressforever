@@ -374,3 +374,14 @@ void CFFProjectilePipebomb::PipebombThink()
 
 	BaseClass::GrenadeThink();
 }
+
+#if(USE_OMNIBOT)
+bool CFFProjectilePipebomb::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_PIPE;
+	return true;
+}
+#endif

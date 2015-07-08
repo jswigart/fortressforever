@@ -2425,7 +2425,7 @@ bool CPhysicsProp::CreateVPhysics()
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CPhysicsProp::CanBePickedUpByPhyscannon( void )
+bool CPhysicsProp::CanBePickedUpByPhyscannon( void ) const
 {
 	if ( HasSpawnFlags( SF_PHYSPROP_PREVENT_PICKUP ) )
 		return false;
@@ -5517,6 +5517,56 @@ void CPhysicsPropRespawnable::Materialize( void )
 }
 
 #endif   // _XBOX
+
+#if(USE_OMNIBOT)
+
+bool CBreakableProp::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
+		classInfo.mGroup = ENT_GRP_PROP_EXPLODE;
+	else
+		classInfo.mGroup = ENT_GRP_PROP;
+
+	//classInfo.mCategory.SetFlag( ENT_CAT_PROP_PUSHABLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_NOLOS );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_MOVER );
+
+	if ( VPhysicsGetObject() != NULL && IsSolid() )
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+
+	return true;
+}
+
+bool CPhysicsProp::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
+		classInfo.mGroup = ENT_GRP_PROP_EXPLODE;
+	else
+		classInfo.mGroup = ENT_GRP_PROP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_PROP_PUSHABLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_NOLOS );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_MOVER );
+
+	if ( CanBePickedUpByPhyscannon() )
+		classInfo.mCategory.SetFlag( ENT_CAT_PICKUP_PHYS );
+
+	if ( VPhysicsGetObject() != NULL )
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+	return true;
+}
+
+#endif
 
 
 //------------------------------------------------------------------------------

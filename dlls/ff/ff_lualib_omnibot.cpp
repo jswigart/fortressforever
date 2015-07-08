@@ -40,21 +40,21 @@ void CFFLuaLib::InitOmnibot(lua_State* L)
 	ASSERT(L);
 	module(L)
 	[
-		def("SendBotTrigger",		&Omnibot::BotSendTriggerEx),
-		def("SendBotSignal",		(void(*)(const char*))&Omnibot::SendBotSignal),
+		def("SendBotTrigger",		&omnibot_interface::BotSendTriggerEx),
+		def("SendBotSignal",		(void(*)(const char*))&omnibot_interface::SendBotSignal),
 
 		class_<Omnibot_GoalTypes>("Bot")
 			.enum_("GoalType")
 			[
-				value("kNone",				Omnibot::kNone),
-				value("kBackPack_Ammo",		Omnibot::kBackPack_Ammo),
-				value("kBackPack_Armor",	Omnibot::kBackPack_Armor),
-				value("kBackPack_Health",	Omnibot::kBackPack_Health),
-				value("kBackPack_Grenades",	Omnibot::kBackPack_Grenades),
-				value("kFlag",				Omnibot::kFlag),
-				value("kFlagCap",			Omnibot::kFlagCap),				
-				value("kTrainerSpawn",		Omnibot::kTrainerSpawn),
-				value("kHuntedEscape",		Omnibot::kHuntedEscape)
+				value("kNone",				omnibot_interface::kNone),
+				value("kBackPack_Ammo",		omnibot_interface::kBackPack_Ammo),
+				value("kBackPack_Armor",	omnibot_interface::kBackPack_Armor),
+				value("kBackPack_Health",	omnibot_interface::kBackPack_Health),
+				value("kBackPack_Grenades",	omnibot_interface::kBackPack_Grenades),
+				value("kFlag",				omnibot_interface::kFlag),
+				value("kFlagCap",			omnibot_interface::kFlagCap),				
+				value("kTrainerSpawn",		omnibot_interface::kTrainerSpawn),
+				value("kHuntedEscape",		omnibot_interface::kHuntedEscape)
 			]
 	];
 };

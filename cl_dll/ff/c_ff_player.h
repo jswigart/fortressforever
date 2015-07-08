@@ -188,7 +188,7 @@ public:
 	// <-- hlstriker
 
 	// client version of CBasePlayer::IsOnLadder
-	virtual bool IsOnLadder( void ) { return GetMoveType() == MOVETYPE_LADDER; }
+	virtual bool IsOnLadder( void ) const { return GetMoveType() == MOVETYPE_LADDER; }
 
 protected:
 	// For render origin

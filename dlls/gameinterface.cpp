@@ -628,7 +628,7 @@ bool CServerGameDLL::DLLInit(CreateInterfaceFn engineFactory,
 	// create the Navigation Mesh interface
 	TheNavMesh = new CNavMesh;
 
-	Omnibot::omnibot_interface::OnDLLInit();
+	omnibot_interface::OnDLLInit();
 
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
@@ -657,7 +657,7 @@ void CServerGameDLL::PostInit()
 
 void CServerGameDLL::DLLShutdown( void )
 {
-	Omnibot::omnibot_interface::OnDLLShutdown();
+	omnibot_interface::OnDLLShutdown();
 
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();
@@ -831,7 +831,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	_timerman.Init();
 	_scriptman.LevelInit(pMapName);
 
-	Omnibot::omnibot_interface::LevelInit();
+	omnibot_interface::LevelInit();
 
 	// IGameSystem::LevelInitPreEntityAllSystems() is called when the world is precached
 	// That happens either in LoadGameState() or in MapEntity_ParseAllEntities()
@@ -1011,7 +1011,7 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	*/
 
 	// Omni-bot: Initialize the bot interface
-	Omnibot::omnibot_interface::InitBotInterface();
+	omnibot_interface::InitBotInterface();
 
 #ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
 	TheBots->ServerActivate();
@@ -1067,7 +1067,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 #ifndef _XBOX
 	// Omni-bot: Update the bot interface
-	Omnibot::omnibot_interface::UpdateBotInterface();
+	omnibot_interface::UpdateBotInterface();
 	TheNavMesh->Update();
 
 	gamestatsuploader->UpdateConnection();
@@ -1191,7 +1191,7 @@ void CServerGameDLL::Think( bool finalTick )
 void CServerGameDLL::LevelShutdown( void )
 {
 	// Omni-bot: Shut down the bot interface
-	Omnibot::omnibot_interface::ShutdownBotInterface();	
+	omnibot_interface::ShutdownBotInterface();	
 
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 

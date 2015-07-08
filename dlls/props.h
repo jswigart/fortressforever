@@ -36,7 +36,7 @@ public:
 	void DrawDebugGeometryOverlays( void );
 
 	// Don't treat as a live target
-	virtual bool IsAlive( void ) { return false; }
+	virtual bool IsAlive( void ) const { return false; }
 	virtual bool OverridePropdata() { return true; }
 };
 
@@ -99,6 +99,10 @@ public:
 	// Disable auto fading under dx7 or when level fades are specified
 	void	DisableAutoFade();
 
+#if(USE_OMNIBOT)
+	virtual bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 public:
 	COutputEvent	m_OnBreak;
 	COutputFloat	m_OnHealthChanged;
@@ -119,8 +123,8 @@ public:
 	float			GetDmgModExplosive( void ) { return m_flDmgModExplosive; }
 	void			SetExplosiveRadius( float flRadius ) { m_explodeRadius = flRadius; }
 	void			SetExplosiveDamage( float flDamage ) { m_explodeDamage = flDamage; }
-	float			GetExplosiveRadius( void ) { return m_explodeRadius; }
-	float			GetExplosiveDamage( void ) { return m_explodeDamage; }
+	float			GetExplosiveRadius( void ) const { return m_explodeRadius; }
+	float			GetExplosiveDamage( void ) const { return m_explodeDamage; }
 	void			SetPhysicsDamageTable( string_t iszTableName ) { m_iszPhysicsDamageTableName = iszTableName; }
 	string_t		GetPhysicsDamageTable( void ) { return m_iszPhysicsDamageTableName; }
 	void			SetBreakableModel( string_t iszModel ) { m_iszBreakableModel = iszModel; }
@@ -349,7 +353,7 @@ public:
 	void InputDisableFloating( inputdata_t &inputdata );
 
 	void EnableMotion( void );
-	bool CanBePickedUpByPhyscannon( void );
+	bool CanBePickedUpByPhyscannon( void ) const;
 	void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason );
 
@@ -371,6 +375,10 @@ public:
 
 	// Specific interactions
 	void	HandleAnyCollisionInteractions( int index, gamevcollisionevent_t *pEvent );
+
+#if(USE_OMNIBOT)
+	virtual bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 private:
 	// Compute impulse to apply to the enabled entity.

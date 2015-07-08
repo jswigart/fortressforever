@@ -789,7 +789,12 @@ bool CMultiplayRules::IsMultiplayer( void )
 			gameeventmanager->FireEvent( event );
 		}
 
-		Omnibot::Notify_Death(pVictim, pKiller, killer_weapon_name);
+#if(USE_OMNIBOT)
+		omnibot_interface::Notify_Death( pVictim, pKiller, killer_weapon_name );
+		CBasePlayer * pPlayerKiller = ToBasePlayer( pKiller );
+		if ( pPlayerKiller )
+			omnibot_interface::Notify_KilledSomeone( pPlayerKiller, pVictim, killer_weapon_name );
+#endif
 	}
 
 	//=========================================================

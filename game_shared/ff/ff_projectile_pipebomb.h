@@ -69,6 +69,10 @@ public:
 
 	void DecrementHUDCount();
 
+#if(USE_OMNIBOT)
+	bool CFFProjectilePipebomb::GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	virtual int DrawModel(int flags);
 #endif

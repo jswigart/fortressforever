@@ -180,6 +180,10 @@ public:
 
 	virtual Class_T Classify( void ) { return CLASS_GREN_SLOWFIELD; } 
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 	virtual color32 GetColour() { color32 col = { 255, 225, 255, GREN_ALPHA_DEFAULT }; return col; }
 
 	virtual void StopLoopingSounds( void );
@@ -542,6 +546,17 @@ void CFFGrenadeSlowfield::UpdateOnRemove()
 		m_flLastThinkTime = gpGlobals->curtime;
 	}
 
+#endif
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeSlowfield::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_SLOW_GRENADE;
+	return true;
+}
 #endif
 
 	

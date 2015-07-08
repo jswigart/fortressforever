@@ -70,6 +70,10 @@ public:
 	virtual void Explode(trace_t *pTrace, int bitsDamageType);
 	virtual void GrenadeThink();
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 protected:
 	int m_iSequence;
 	Activity m_Activity;
@@ -306,3 +310,14 @@ void CFFGrenadeGas::Precache()
 	PrecacheScriptSound( "GasGrenade.Open" );
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeGas::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_GAS_GRENADE;
+	return true;
+}
+#endif

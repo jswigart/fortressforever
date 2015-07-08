@@ -347,3 +347,14 @@ CFFProjectileDart *CFFProjectileDart::CreateDart(const CBaseEntity *pSource, con
 
 	return pDart;
 }
+
+#if(USE_OMNIBOT)
+bool CFFProjectileDart::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_DART;
+	return true;
+}
+#endif

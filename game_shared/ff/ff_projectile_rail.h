@@ -53,6 +53,11 @@ public:
 
 	virtual bool			CanClipOwnerEntity() const { return m_iNumBounces > 0; }
 
+	
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 
 	virtual void OnDataChanged(DataUpdateType_t type);

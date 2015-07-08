@@ -483,10 +483,13 @@ void CFFBuildableInfo::GetBuildError( void )
 #ifdef GAME_DLL
 		ClientPrint( m_pPlayer, HUD_PRINTCENTER, szError );
 
+#if(USE_OMNIBOT)
 		if(m_pPlayer)
 		{
-			Omnibot::Notify_Build_CantBuild(m_pPlayer, m_pPlayer->GetWantBuild());
+			omnibot_interface::Notify_Build_CantBuild(m_pPlayer, m_pPlayer->GetWantBuild());
 		}
+#endif
+
 #endif
 	}
 }
@@ -861,6 +864,33 @@ CFFManCannon::CFFManCannon( void )
 CFFManCannon::~CFFManCannon( void )
 {
 }
+
+#if(USE_OMNIBOT)
+bool CFFManCannon::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_BUILDABLE;
+	classInfo.mClassId = TF_CLASSEX_MANCANNON;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+
+	if ( !IsBuilt() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
+	else
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+
+	if ( CanSabotage() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
+
+	if ( IsSabotaged() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+	return true;
+}
+#endif
 
 #ifdef CLIENT_DLL
 

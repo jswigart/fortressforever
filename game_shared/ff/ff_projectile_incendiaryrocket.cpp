@@ -269,3 +269,14 @@ void CFFProjectileIncendiaryRocket::ArcThink()
 
 	SetNextThink(gpGlobals->curtime + 0.1f);
 }
+
+#if(USE_OMNIBOT)
+bool CFFProjectileIncendiaryRocket::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_NAPALM;
+	return true;
+}
+#endif

@@ -133,6 +133,10 @@ public:
 	bool SetNextHitTime( CBaseEntity *pEntity, float flDelay );
 	void ClearHitTimes();
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 protected:
 	float	m_flBeams;
 	float	m_flNailSpit;
@@ -641,4 +645,14 @@ float CFFGrenadeLaser::getLengthPercent()
 
 #endif
 
+#if(USE_OMNIBOT)
+bool CFFGrenadeLaser::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_GAS_GRENADE;
+	return true;
+}
+#endif
 

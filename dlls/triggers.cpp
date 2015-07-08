@@ -1115,6 +1115,26 @@ void CTriggerMultiple::MultiWaitOver( void )
 	SetThink( NULL );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+#if(USE_OMNIBOT)
+bool CTriggerMultiple::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_MAP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_TRIGGER );
+
+	if ( !m_bDisabled )
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+	return true;
+}
+#endif
+
 // ##################################################################################
 //	>> func_ff_script
 // ##################################################################################
@@ -1129,7 +1149,7 @@ CFuncFFScript::CFuncFFScript()
 
 	// bot info
 	m_BotTeamFlags = 0;
-	m_BotGoalType = Omnibot::kNone;
+	m_BotGoalType = omnibot_interface::kNone;
 }
 
 //-----------------------------------------------------------------------------
@@ -1212,30 +1232,71 @@ void CFuncFFScript::SetBotGoalInfo(int _type, int _team)
 	m_BotGoalType = _type;
 	m_BotTeamFlags = 0;
 	const int iAllTeams = 
-		(1<<Omnibot::TF_TEAM_BLUE)|
-		(1<<Omnibot::TF_TEAM_RED)|
-		(1<<Omnibot::TF_TEAM_YELLOW)|
-		(1<<Omnibot::TF_TEAM_GREEN);
+		(1<<TF_TEAM_BLUE)|
+		(1<<TF_TEAM_RED)|
+		(1<<TF_TEAM_YELLOW)|
+		(1<<TF_TEAM_GREEN);
 	switch(_team)
 	{
 	case 0:
 		m_BotTeamFlags = iAllTeams;
 		break;
 	case TEAM_BLUE:
-		m_BotTeamFlags = iAllTeams & ~(1<<Omnibot::TF_TEAM_BLUE);
+		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_BLUE);
 		break;
 	case TEAM_RED:
-		m_BotTeamFlags = iAllTeams & ~(1<<Omnibot::TF_TEAM_RED);
+		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_RED);
 		break;
 	case TEAM_YELLOW:
-		m_BotTeamFlags = iAllTeams & ~(1<<Omnibot::TF_TEAM_YELLOW);
+		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_YELLOW);
 		break;
 	case TEAM_GREEN:
-		m_BotTeamFlags = iAllTeams & ~(1<<Omnibot::TF_TEAM_GREEN);
+		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_GREEN);
 		break;
-	}	
-	Omnibot::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
+	}
+	omnibot_interface::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
 }
+
+#if(USE_OMNIBOT)
+bool CFuncFFScript::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+	
+	// clear the trigger from the parent
+	classInfo.mGroup = ENT_GRP_UNKNOWN;
+
+	switch( m_BotGoalType )
+	{
+	case omnibot_interface::kBackPack_Ammo:
+		classInfo.mGroup = ENT_GRP_AMMO1;
+		break;
+	case omnibot_interface::kBackPack_Armor:
+		classInfo.mGroup = ENT_GRP_ARMOR;
+		break;
+	case omnibot_interface::kBackPack_Health:
+		classInfo.mGroup = ENT_GRP_HEALTH;
+		break;
+	case omnibot_interface::kBackPack_Grenades:
+		break;
+	case omnibot_interface::kFlag:
+		classInfo.mGroup = ENT_GRP_FLAG;
+		break;
+	case omnibot_interface::kFlagCap:
+		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
+		break;
+	case omnibot_interface::kHuntedEscape:
+		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
+		break;		
+	case omnibot_interface::kTrainerSpawn:
+	case omnibot_interface::kNone:
+	default:
+		classInfo.mCategory.ClearAll();
+		return false;
+	}
+
+	return true;
+}
+#endif
 
 // ##################################################################################
 //	>> TriggerOnce

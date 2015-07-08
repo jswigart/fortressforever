@@ -116,9 +116,9 @@ public:
 	CTraceFilterSimple( const IHandleEntity *passentity, int collisionGroup );
 	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask );
 	virtual void SetPassEntity( const IHandleEntity *pPassEntity ) { m_pPassEnt = pPassEntity; }
+	virtual void SetCollisionGroup( int iCollisionGroup ) { m_collisionGroup = iCollisionGroup; }
 
-	const IHandleEntity *GetPassEntity( void ){ return m_pPassEnt;}
-
+	const IHandleEntity *GetPassEntity( void ){ return m_pPassEnt;}	
 private:
 	const IHandleEntity *m_pPassEnt;
 	int m_collisionGroup;

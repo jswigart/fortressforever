@@ -1004,11 +1004,13 @@ int CFFBuildableObject::OnTakeDamage( const CTakeDamageInfo &info )
 	}
 
 	// Just extending this to send events to the bots.
+#if(USE_OMNIBOT)
 	if(pOwner)
 	{
-		Omnibot::Notify_BuildableDamaged(pOwner, Classify(), this);
+		omnibot_interface::Notify_BuildableDamaged(pOwner, Classify(), this);
 		SendStatsToBot();
 	}
+#endif
 
 	return res;
 }

@@ -150,9 +150,6 @@ class PseudoNail
 
 #endif
 
-
-
-
 class CFFGrenadeNail : public CFFGrenadeBase
 {
 public:
@@ -174,6 +171,10 @@ public:
 	virtual void Spawn();
 	virtual void NailEmit();
 	virtual void Explode(trace_t *pTrace, int bitsDamageType);
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 private:
 	void ShootNail( const Vector& vecOrigin, const QAngle& vecAngles );
@@ -439,4 +440,14 @@ void CFFGrenadeNail::Precache()
 
 #endif
 
+#if(USE_OMNIBOT)
+bool CFFGrenadeNail::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_MIRVLET_GRENADE;
+	return true;
+}
+#endif
 

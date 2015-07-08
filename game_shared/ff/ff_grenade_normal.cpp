@@ -44,6 +44,10 @@ public:
 	CFFGrenadeNormal() {}
 	CFFGrenadeNormal(const CFFGrenadeNormal &) {}
 #endif
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 IMPLEMENT_NETWORKCLASS_ALIASED(FFGrenadeNormal, DT_FFGrenadeNormal)
@@ -73,3 +77,14 @@ void CFFGrenadeNormal::Precache()
 
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeNormal::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_GRENADE;
+	return true;
+}
+#endif

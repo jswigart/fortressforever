@@ -233,3 +233,14 @@ CFFProjectileNail *CFFProjectileNail::CreateNail(const CBaseEntity *pSource, con
 
 	return pNail;
 }
+
+#if(USE_OMNIBOT)
+bool CFFProjectileNail::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_NAIL;
+	return true;
+}
+#endif

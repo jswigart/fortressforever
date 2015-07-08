@@ -110,9 +110,11 @@ void CFFWeaponMedkit::Hit(trace_t &traceHit, Activity nHitActivity)
 			pTarget->Cure(pPlayer);
 			pTarget->Heal(pPlayer, 5);		// |-- Mirv: Heal them by 5hp
 
+#if(USE_OMNIBOT)
 			const int iAfterHealth = pPlayer->GetHealth();
-			Omnibot::Notify_GotMedicHealth(pTarget,pPlayer,iBeforeHealth,iAfterHealth);
-			Omnibot::Notify_GaveMedicHealth(pPlayer,pTarget,iBeforeHealth,iAfterHealth);
+			omnibot_interface::Notify_GotMedicHealth(pTarget,pPlayer,iBeforeHealth,iAfterHealth);
+			omnibot_interface::Notify_GaveMedicHealth(pPlayer,pTarget,iBeforeHealth,iAfterHealth);
+#endif
 #endif
 
 			// Heal sound. Add a delay before next sound can be played too

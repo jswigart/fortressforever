@@ -45,6 +45,11 @@ public:
 
 	virtual color32 GetColour() { color32 col = { 225, 225, 0, GREN_ALPHA_DEFAULT }; return col; }
 
+	
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	CFFGrenadeEmp() {}
 	CFFGrenadeEmp( const CFFGrenadeEmp& ) {}

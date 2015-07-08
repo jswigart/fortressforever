@@ -127,8 +127,8 @@ void CFFWeaponPipeLauncher::Fire()
 	CFFProjectilePipebomb *pPipe = CFFProjectilePipebomb::CreatePipebomb(this, vecSrc, pPlayer->EyeAngles() - QAngle(12.0f, 0.0f, 0.0f), pPlayer, pWeaponInfo.m_iDamage, PIPE_DAMAGERADIUS/*pWeaponInfo.m_iDamageRadius*/, pWeaponInfo.m_iSpeed);
 	pPipe;
 
-#ifdef GAME_DLL
-	Omnibot::Notify_PlayerShoot(pPlayer, Omnibot::TF_WP_PIPELAUNCHER, pPipe);
+#if(USE_OMNIBOT)
+	omnibot_interface::Notify_PlayerShoot(pPlayer, TF_WP_PIPELAUNCHER, pPipe);
 #endif
 
 #ifdef CLIENT_DLL

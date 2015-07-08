@@ -143,8 +143,11 @@ public:
 	bool			HasAnimations( void ) const { return m_bHasAnims; }
 	virtual Class_T	Classify( void ) { return CLASS_INFOSCRIPT; }
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 	void SetBotGoalInfo(int _type);
-	void SpawnBot(const char *_name, int _team, int _class);
 
 	// returns the criteria necessary for another entity to "touch" this entity
 	int GetTouchFlags( void ) const { return m_allowTouchFlags; }

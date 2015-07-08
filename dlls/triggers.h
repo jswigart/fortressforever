@@ -109,6 +109,10 @@ public:
 	void MultiTouch( CBaseEntity *pOther );
 	void MultiWaitOver( void );
 	void ActivateMultiTrigger(CBaseEntity *pActivator);
+	
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 	DECLARE_DATADESC();
 
@@ -192,6 +196,11 @@ public:
 	// bot info accessors
 	int GetBotTeamFlags() const { return m_BotTeamFlags; }
 	int GetBotGoalType() const { return m_BotGoalType; }
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 protected:
 	int	m_iGoalState;
 	int m_iClipMask;

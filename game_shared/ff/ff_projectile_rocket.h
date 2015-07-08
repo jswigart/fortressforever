@@ -46,6 +46,10 @@ public:
 	virtual void Spawn();
 	void CreateSmokeTrail();
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 #ifdef CLIENT_DLL
 	CFFProjectileRocket();
 	CFFProjectileRocket(const CFFProjectileRocket&) { CFFProjectileRocket(); }

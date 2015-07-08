@@ -20,6 +20,8 @@
 #include "ServerNetworkProperty.h"
 #include "shareddefs.h"
 
+#include "../omnibot/omnibot_interface.h"
+
 class CDamageModifier;
 
 struct CSoundParameters;
@@ -898,6 +900,9 @@ public:
 	void			DispatchTraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
 	virtual bool	PassesDamageFilter( const CTakeDamageInfo &info );
 
+#if(USE_OMNIBOT)
+	virtual bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 
 protected:
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
@@ -914,7 +919,7 @@ public:
 
 	virtual int		TakeHealth( float flHealth, int bitsDamageType );
 
-	bool	IsAlive( void );
+	bool	IsAlive( void ) const;
 	// Entity killed (only fired once)
 	virtual void	Event_Killed( const CTakeDamageInfo &info );
 	

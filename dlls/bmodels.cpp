@@ -1235,6 +1235,19 @@ public:
 	bool EntityPassesFilter( CBaseEntity *pOther );
 	bool ForceVPhysicsCollide( CBaseEntity *pEntity );
 
+#ifdef USE_OMNIBOT
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const
+	{
+		BaseClass::GetOmnibotEntityType( classInfo );
+
+		classInfo.mGroup = ENT_GRP_PROP;
+		
+		classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE, true );
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE, IsSolid() );
+		return true;
+	}
+#endif
+
 private:
 
 	string_t						m_iFilterName;

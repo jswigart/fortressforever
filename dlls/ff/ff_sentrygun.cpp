@@ -1806,11 +1806,13 @@ void CFFSentryGun::SetFocusPoint( Vector &origin )
 	//	NDebugOverlay::Line( EyePosition(), origin, 255, 0, 255, false, 5.0f );
 #endif
 
+#if(USE_OMNIBOT)
 	CFFPlayer *pOwner = static_cast<CFFPlayer*>(m_hOwner.Get());
 	if(pOwner)
 	{
-		Omnibot::Notify_SentryAimed(pOwner, this, dir);
+		omnibot_interface::Notify_SentryAimed(pOwner, this, dir);
 	}
+#endif
 }
 
 // How much damage should be taken from an emp explosion
@@ -1981,3 +1983,40 @@ void CFFSentryGun::PhysicsSimulate()
 		m_iLastState = iState;
 	}
 }
+
+#if(USE_OMNIBOT)
+bool CFFSentryGun::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_BUILDABLE;
+	classInfo.mClassId = TF_CLASSEX_SENTRY;
+
+	classInfo.mQuantity.Set( GetLevel(), 3 );
+
+	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE );
+	classInfo.mCategory.SetFlag( ENT_CAT_AUTODEFENSE );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+
+	classInfo.mAmmo1.Set( m_iShells, m_iMaxShells );
+	classInfo.mAmmo2.Set( m_iRockets, m_iMaxRockets );
+
+	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
+
+	if ( !IsBuilt() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
+	else
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+
+	if ( CanSabotage() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
+
+	if ( IsSabotaged() )
+		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+
+	return true;
+}
+#endif
+

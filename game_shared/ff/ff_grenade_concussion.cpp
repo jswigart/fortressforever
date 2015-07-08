@@ -130,6 +130,10 @@ public:
 	virtual const char *GetBounceSound() { return "ConcussionGrenade.Bounce"; }
 	virtual Class_T Classify( void ) { return CLASS_GREN_CONC; }
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 	virtual color32 GetColour() { color32 col = { 255, 255, 210, GREN_ALPHA_DEFAULT }; return col; }
 
 	virtual void Explode(trace_t *pTrace, int bitsDamageType);
@@ -422,6 +426,17 @@ void CFFGrenadeConcussion::Precache()
 	PrecacheScriptSound(CONCUSSION_SOUND);
 	BaseClass::Precache();
 }
+
+#if(USE_OMNIBOT)
+bool CFFGrenadeConcussion::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PROJECTILE;
+	classInfo.mClassId = TF_CLASSEX_CONC_GRENADE;
+	return true;
+}
+#endif
 
 //=============================================================================
 // CFFGrenadeConcussionGlow implementation

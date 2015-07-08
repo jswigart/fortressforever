@@ -173,6 +173,18 @@ bool CFuncBrush::IsOn( void )
 	return !IsEffectActive( EF_NODRAW );
 }
 
+#if(USE_OMNIBOT)
+bool CFuncBrush::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_MAP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	return true;
+}
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Invisible field that activates when touched

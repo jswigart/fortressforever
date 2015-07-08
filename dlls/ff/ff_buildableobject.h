@@ -93,7 +93,7 @@ public:
 	int OnTakeDamage( const CTakeDamageInfo &info );
 
 	virtual void Event_Killed( const CTakeDamageInfo &info );
-	virtual bool IsAlive( void ) { return true; }
+	virtual bool IsAlive( void ) const { return true; }
 	virtual bool IsPlayer( void ) const { return false; }
 
 	bool ShouldSavePhysics( void ) { return false; }

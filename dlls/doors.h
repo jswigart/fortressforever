@@ -124,6 +124,10 @@ public:
 	COutputEvent m_OnClose;					// Triggered when the door is told to close.
 	COutputEvent m_OnOpen;					// Triggered when the door is told to open.
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 	void			StartMovingSound( void );
 	virtual void	StopMovingSound( void );
 	void			MovingSoundThink( void );
