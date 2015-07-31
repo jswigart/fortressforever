@@ -254,6 +254,10 @@ CFFProjectileIncendiaryRocket * CFFProjectileIncendiaryRocket::CreateRocket(cons
 	pRocket->m_flDamage = iDamage;
 	pRocket->m_DmgRadius = iDamageRadius;
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pRocket );
+
 	return pRocket; 
 }
 

@@ -341,6 +341,10 @@ CFFProjectilePipebomb * CFFProjectilePipebomb::CreatePipebomb(const CBaseEntity 
 	}
 #endif
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pPipebomb );
+
 	return pPipebomb; 
 }
 
@@ -382,6 +386,13 @@ bool CFFProjectilePipebomb::GetOmnibotEntityType( EntityInfo& classInfo ) const
 
 	classInfo.mGroup = ENT_GRP_PROJECTILE;
 	classInfo.mClassId = TF_CLASSEX_PIPE;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
+
+	classInfo.mNavFlags = NAVFLAGS_THREAT_LVL3;
+
 	return true;
 }
 #endif

@@ -231,6 +231,10 @@ CFFProjectileNail *CFFProjectileNail::CreateNail(const CBaseEntity *pSource, con
 
 	pNail->m_flDamage = iDamage;
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pNail );
+
 	return pNail;
 }
 

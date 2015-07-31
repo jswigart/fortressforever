@@ -345,6 +345,10 @@ CFFProjectileDart *CFFProjectileDart::CreateDart(const CBaseEntity *pSource, con
 
 	pDart->m_flDamage = iDamage;
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pDart );
+
 	return pDart;
 }
 

@@ -1244,6 +1244,7 @@ public:
 		
 		classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE, true );
 		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE, IsSolid() );
+		classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
 		return true;
 	}
 #endif

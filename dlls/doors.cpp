@@ -1306,7 +1306,8 @@ bool CBaseDoor::GetOmnibotEntityType( EntityInfo& classInfo ) const
 
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 	classInfo.mCategory.SetFlag( ENT_CAT_MOVER );
-	classInfo.mCategory.SetFlag( ENT_CAT_TRIGGER );
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
 
 	if ( VPhysicsGetObject() != NULL && IsSolid() )
 	{

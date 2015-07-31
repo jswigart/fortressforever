@@ -221,4 +221,41 @@ void CFFTriggerClip::LUA_SetClipFlags( const luabind::adl::object& hTable )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+#if(USE_OMNIBOT)
+bool CFFTriggerClip::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_MAP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+
+	if ( IsClipMaskSet( LUA_CLIP_FLAG_PLAYERS ) )
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+
+		classInfo.mTeamMask = 0;
+		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMBLUE ) )
+			classInfo.mTeamMask = 1<<0;
+		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMRED ) )
+			classInfo.mTeamMask = 1<<1;
+		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMYELLOW ) )
+			classInfo.mTeamMask = 1<<2;
+		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMGREEN ) )
+			classInfo.mTeamMask = 1<<3;
+	}
+	else if ( IsClipMaskSet( LUA_CLIP_FLAG_PLAYERSBYTEAM ) )
+	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
+	}
+	else
+	{
+		// not collidable
+	}
+	return true;
+}
+#endif
 #endif

@@ -181,6 +181,8 @@ bool CFuncBrush::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mGroup = ENT_GRP_MAP;
 
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+
+	classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
 	return true;
 }
 #endif

@@ -5534,6 +5534,8 @@ bool CBreakableProp::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 	classInfo.mCategory.SetFlag( ENT_CAT_MOVER );
 
+	classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
+
 	if ( VPhysicsGetObject() != NULL && IsSolid() )
 	{
 		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
@@ -5555,9 +5557,11 @@ bool CPhysicsProp::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mCategory.SetFlag( ENT_CAT_NOLOS );
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 	classInfo.mCategory.SetFlag( ENT_CAT_MOVER );
-
+	
 	if ( CanBePickedUpByPhyscannon() )
 		classInfo.mCategory.SetFlag( ENT_CAT_PICKUP_PHYS );
+
+	classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
 
 	if ( VPhysicsGetObject() != NULL )
 	{

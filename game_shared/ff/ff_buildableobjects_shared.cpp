@@ -732,9 +732,9 @@ int CFFBuildableObject::GetHealthPercent( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: Team accessor [mirv]
 //-----------------------------------------------------------------------------
-int CFFBuildableObject::GetTeamNumber()
+int CFFBuildableObject::GetTeamNumber() const
 {
-	CFFPlayer *pOwner = GetOwnerPlayer();
+	const CFFPlayer *pOwner = GetOwnerPlayer();
 
 	if (!pOwner)
 		return TEAM_UNASSIGNED;
@@ -745,7 +745,7 @@ int CFFBuildableObject::GetTeamNumber()
 //-----------------------------------------------------------------------------
 // Purpose: Get a buildables owner
 //-----------------------------------------------------------------------------
-CFFPlayer *CFFBuildableObject::GetOwnerPlayer( void )
+CFFPlayer *CFFBuildableObject::GetOwnerPlayer( void ) const
 {
 	if( m_hOwner.Get() )
 		return ToFFPlayer( m_hOwner.Get() );
@@ -876,18 +876,23 @@ bool CFFManCannon::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE );
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 
+	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
+
+	classInfo.mNavFlags = NAVFLAGS_JUMPPAD;
+
 	if ( !IsBuilt() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
-	else
-	{
-		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
-	}
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
 
 	if ( CanSabotage() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
 
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+
+	classInfo.mTeamMask = 1 << GetTeamNumber();
+
 	return true;
 }
 #endif

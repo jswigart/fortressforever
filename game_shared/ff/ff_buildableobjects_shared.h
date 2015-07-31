@@ -252,12 +252,12 @@ public:
 	virtual bool IsPlayer( void ) const { return false; }
 	virtual bool BlocksLOS( void ) { return true; }
 	virtual int	BloodColor( void ) { return BLOOD_COLOR_MECH; } // |-- Mirv: Don't bleed
-	virtual int	GetTeamNumber();	// |-- Mirv: Easy team id accessor	
+	virtual int	GetTeamNumber() const;	// |-- Mirv: Easy team id accessor	
 	bool IsBuilt( void	) const { return m_bBuilt; }
  
 	CNetworkHandle( CBaseEntity, m_hOwner );
 
-	CFFPlayer *GetOwnerPlayer( void );
+	CFFPlayer *GetOwnerPlayer( void ) const;
 	CFFPlayer *GetPlayerOwner( void ) { return GetOwnerPlayer(); } // I always want to type it this way instead of the one that already exists
 	CFFTeam *GetOwnerTeam( void );
 	int GetOwnerTeamId( void );

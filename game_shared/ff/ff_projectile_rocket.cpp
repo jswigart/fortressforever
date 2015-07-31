@@ -338,6 +338,10 @@ CFFProjectileRocket * CFFProjectileRocket::CreateRocket(const CBaseEntity *pSour
 	//pRocket->EmitSound("rocket.fly");
 	// this is being swapped over to the client -mirv
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pRocket );
+
 	return pRocket; 
 }
 

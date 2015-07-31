@@ -994,6 +994,25 @@ public:
 		return Success;
 	}
 
+	obResult GetEntityForName( const char* entName, GameEntity& entityOut )
+	{
+		CBaseEntity * ent = gEntList.FirstEnt();
+		while ( ent != NULL )
+		{
+			obStringBuffer nameBuffer;
+			GetEntityName( HandleFromEntity( ent ), nameBuffer );
+
+			if ( !Q_stricmp( entName, nameBuffer.mBuffer ) )
+			{
+				entityOut = HandleFromEntity( ent );
+				return Success;
+			}
+
+			ent = gEntList.NextEnt( ent );
+		}
+		return InvalidEntity;
+	}
+
 	obResult GetWorldModel( GameModelInfo & modelOut, MemoryAllocator & alloc )
 	{
 		Q_snprintf( modelOut.mModelType, sizeof( modelOut.mModelType ), "bsp" );
@@ -1419,30 +1438,36 @@ public:
 		return 0;
 	}
 
-	const char *GetEntityName( const GameEntity _ent )
+	obResult GetEntityName( const GameEntity _ent, obStringBuffer& nameOut )
 	{
-		const char *pName = 0;
 		CBaseEntity *pEntity = EntityFromHandle( _ent );
 		if ( pEntity )
 		{
 			CBasePlayer *pPlayer = ToBasePlayer( pEntity );
 			if ( pPlayer )
-				pName = pPlayer->GetPlayerName();
+			{
+				const char* pName = pPlayer->GetPlayerName();
+				Q_snprintf( nameOut.mBuffer, obStringBuffer::BUFFER_LENGTH, "%s", pName );
+			}
 			else
 			{
-				pName = pEntity->GetEntityName().ToCStr();
-				if ( !pName || pName[ 0 ] == NULL )
-				{
-					const char * cn = pEntity->GetClassname();
-					const CBaseHandle &hndl = pEntity->GetRefEHandle();
+				CBaseEntity* entParent = pEntity->GetParent();
+				const char* entParentName = entParent ? entParent->GetEntityName().ToCStr() : NULL;
 
-					static char buffer[ 64 ];
-					pName = buffer;
-					Q_snprintf( buffer, 64, "%s_%d_%d", cn ? cn : "", hndl.GetEntryIndex(), hndl.GetSerialNumber() );
-				}
+				const char* pName = pName = pEntity->GetEntityName().ToCStr();
+				const char* cls = pEntity->GetClassname();
+				const CBaseHandle &hndl = pEntity->GetRefEHandle();
+
+				Q_snprintf( nameOut.mBuffer, obStringBuffer::BUFFER_LENGTH, 
+					"%s%s%s_%d", 
+					entParentName ? entParentName : "", 
+					entParentName ? "_" : "",
+					(pName && pName[0]) ? pName : cls, 
+					hndl.GetEntryIndex() );
 			}
+			return Success;
 		}
-		return pName ? pName : "";
+		return InvalidEntity;
 	}
 
 	int GetCurrentWeapons( const GameEntity ent, int weaponIds [], int maxWeapons )
@@ -2158,31 +2183,34 @@ public:
 	{
 		if ( _msg )
 		{
-			if ( _pos )
-			{
-				Vector vPosition( _pos[ 0 ], _pos[ 1 ], _pos[ 2 ] );
-				debugoverlay->AddTextOverlay( vPosition, _duration, _msg );
-			}
-			else
-			{
-				float fVertical = 0.75;
+			float fVertical = 0.75;
 
-				// Handle newlines
-				char buffer[ 1024 ] = {};
-				Q_strncpy( buffer, _msg, 1024 );
-				char *pbufferstart = buffer;
+			// Handle newlines
+			char buffer[ 1024 ] = {};
+			Q_strncpy( buffer, _msg, 1024 );
+			char *pbufferstart = buffer;
 
-				int iLength = Q_strlen( buffer );
-				for ( int i = 0; i < iLength; ++i )
+			int line = 0;
+			int iLength = Q_strlen( buffer );
+			for ( int i = 0; i < iLength; ++i )
+			{
+				if ( buffer[ i ] == '\n' || buffer[ i + 1 ] == '\0' )
 				{
-					if ( buffer[ i ] == '\n' || buffer[ i + 1 ] == '\0' )
+					buffer[ i++ ] = 0;
+
+					if ( _pos )
 					{
-						buffer[ i++ ] = 0;
+						Vector vPosition( _pos[ 0 ], _pos[ 1 ], _pos[ 2 ] );
+						debugoverlay->AddTextOverlayRGB( vPosition, line++, _duration, _color.rF(), _color.gF(), _color.bF(), _color.aF(), pbufferstart );
+					}
+					else
+					{
 						debugoverlay->AddScreenTextOverlay( 0.3f, fVertical, _duration,
 							_color.r(), _color.g(), _color.b(), _color.a(), pbufferstart );
-						fVertical += 0.02f;
-						pbufferstart = &buffer[ i ];
 					}
+
+					fVertical += 0.02f;
+					pbufferstart = &buffer[ i ];
 				}
 			}
 		}

@@ -156,6 +156,10 @@ void CFFGrenadeMirv::Explode( trace_t *pTrace, int bitsDamageType )
 		pMirvlet->SetThrower( (CBaseCombatCharacter*)pOwner ); 
 		pMirvlet->SetGravity( GetGrenadeGravity() + 0.2f );
 		pMirvlet->SetFriction( GetGrenadeFriction() );
+
+		// plugin/bot notification, since the create/spawn above don't call spawn notification
+		// remove this if that is changed
+		gEntList.NotifySpawn( pMirvlet );
 	}
 }
 #endif

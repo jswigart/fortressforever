@@ -302,6 +302,10 @@ CFFProjectileGrenade * CFFProjectileGrenade::CreateGrenade(const CBaseEntity *pS
 
 	pGrenade->SetLocalAngularVelocity(RandomAngle(-400, 400));
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed in the future
+	gEntList.NotifySpawn( pGrenade );
+
 	return pGrenade; 
 }
 

@@ -2003,18 +2003,34 @@ bool CFFSentryGun::GetOmnibotEntityType( EntityInfo& classInfo ) const
 
 	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
 
+	switch( GetLevel() )
+	{
+	case 1:
+		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
+		break;
+	case 2:
+		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL2;
+		break;
+	case 3:
+		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL3;
+		break;
+	default:
+		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
+		break;
+	}
+
 	if ( !IsBuilt() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
-	else
-	{
-		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
-	}
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
 
 	if ( CanSabotage() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
 
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+
+	classInfo.mTeamMask = 1 << GetTeamNumber();
 
 	return true;
 }

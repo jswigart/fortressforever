@@ -310,7 +310,24 @@ public:
 	DECLARE_CLASS( CFFTeamSpawn, CPointEntity );
 
 	virtual Class_T Classify( void ) { return CLASS_TEAMSPAWN; }
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
+
+
+#if(USE_OMNIBOT)
+bool CFFTeamSpawn::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_PLAYERSTART;
+	
+	return true;
+}
+#endif
+
 
 LINK_ENTITY_TO_CLASS( info_ff_teamspawn , CFFTeamSpawn );
 
@@ -5252,6 +5269,10 @@ void CFFPlayer::ThrowGrenade(float fTimer, float flSpeed)
 		else if(m_iGrenadeState == FF_GREN_PRIMETWO)
 			Notify_PlayerShoot(this, TF_WP_GRENADE2, pGrenade);*/
 #endif
+
+		// plugin/bot notification, since the create/spawn above don't call spawn notification
+		// remove this if that is changed
+		gEntList.NotifySpawn( pGrenade );
 	}
 }
 
@@ -8156,6 +8177,8 @@ bool CFFPlayer::GetOmnibotEntityType( EntityInfo& classInfo ) const
 			break;
 		}
 	}
+
+	classInfo.mTeamMask = 1<<GetTeamNumber();
 
 	return true;
 }

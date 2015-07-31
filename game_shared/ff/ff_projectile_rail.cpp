@@ -153,6 +153,10 @@ CFFProjectileRail *CFFProjectileRail::CreateRail( const CBaseEntity *pSource, co
 	pRail->m_flDamage = iDamage;
 	pRail->m_DmgRadius = iDamageRadius;
 
+	// plugin/bot notification, since the create/spawn above don't call spawn notification
+	// remove this if that is changed
+	gEntList.NotifySpawn( pRail );
+
 	return pRail;
 }
 

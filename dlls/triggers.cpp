@@ -794,6 +794,10 @@ public:
 	COutputEvent m_OnHurtPlayer;
 
 	CUtlVector<EHANDLE>	m_hurtEntities;
+
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 };
 
 BEGIN_DATADESC( CTriggerHurt )
@@ -1022,6 +1026,25 @@ void CTriggerHurt::Touch( CBaseEntity *pOther )
 		SetNextThink( gpGlobals->curtime );
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+#if(USE_OMNIBOT)
+bool CTriggerHurt::GetOmnibotEntityType( EntityInfo& classInfo ) const
+{
+	BaseClass::GetOmnibotEntityType( classInfo );
+
+	classInfo.mGroup = ENT_GRP_MAP;
+
+	classInfo.mCategory.SetFlag( ENT_CAT_TRIGGER );
+	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_SAVENAV );
+	classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE, !m_bDisabled );
+	return true;
+}
+#endif
 
 
 // ##################################################################################

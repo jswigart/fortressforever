@@ -685,20 +685,24 @@ bool CFFDispenser::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mAmmo2.Set( m_iShells, m_iMaxShells );
 	classInfo.mAmmo2.Set( m_iNails, m_iMaxNails );
 	classInfo.mAmmo4.Set( m_iRockets, m_iMaxRockets );
+
 	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
+
+	classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
 
 	if ( !IsBuilt() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
-	else
-	{
-		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
-	}
+	
+	classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
 
 	if ( CanSabotage() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_CAN_SABOTAGE );
 
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
+
+	classInfo.mTeamMask = 1 << GetTeamNumber();
+
 	return true;
 }
 #endif

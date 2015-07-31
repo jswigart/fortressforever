@@ -97,6 +97,9 @@ public:
 	void LUA_SetClipFlags( const luabind::adl::object& hTable );
 #endif
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
 private:
 	CNetworkVar( int, m_iClipMask );
 };
