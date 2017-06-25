@@ -62,7 +62,6 @@ public:
 #endif
 
 	virtual void PrimaryAttack( void );
-	virtual void SecondaryAttack( void );
 	virtual void WeaponIdle( void );
 	virtual bool Holster(CBaseCombatWeapon *pSwitchingTo);
 	virtual bool CanBeSelected( void );
@@ -186,17 +185,6 @@ void CFFWeaponDeploySentryGun::PrimaryAttack( void )
 }
 
 //----------------------------------------------------------------------------
-// Purpose: Handles whatever should be done when they secondary fire
-//----------------------------------------------------------------------------
-void CFFWeaponDeploySentryGun::SecondaryAttack( void ) 
-{
-	if( m_flNextSecondaryAttack < gpGlobals->curtime )
-	{
-		m_flNextSecondaryAttack = gpGlobals->curtime;
-	}
-}
-
-//----------------------------------------------------------------------------
 // Purpose: Checks validity of ground at this point or whatever
 //----------------------------------------------------------------------------
 void CFFWeaponDeploySentryGun::WeaponIdle( void ) 
@@ -226,32 +214,6 @@ void CFFWeaponDeploySentryGun::WeaponIdle( void )
 		}
 		else
 			Cleanup();
-
-		// If we haven't built a sentrygun...
-		//if( !pPlayer->GetSentryGun() )
-		//{
-		//	CFFBuildableInfo hBuildInfo( pPlayer, FF_BUILD_SENTRYGUN );
-
-		//	if( m_pBuildable )
-		//	{
-		//		// Update current fake sentrygun
-		//		m_pBuildable->SetAbsOrigin( hBuildInfo.GetBuildOrigin() );
-		//		m_pBuildable->SetAbsAngles( hBuildInfo.GetBuildAngles() );
-		//		m_pBuildable->SetBuildError( hBuildInfo.BuildResult() );
-		//	}
-		//	else
-		//	{
-		//		// Create fake sentrygun
-		//		m_pBuildable = CFFSentryGun::CreateClientSideSentryGun( hBuildInfo.GetBuildOrigin(), hBuildInfo.GetBuildAngles() );
-		//	}
-		//}
-		//else
-		//	Cleanup();
-
-		//// If we're building something else, make sure to clean up
-		//// this thing
-		//if( pPlayer->IsBuilding() )
-		//	Cleanup();
 #endif
 	}
 }
@@ -265,52 +227,11 @@ bool CFFWeaponDeploySentryGun::Holster(CBaseCombatWeapon *pSwitchingTo)
 
 bool CFFWeaponDeploySentryGun::CanDeploy( void )
 {
-	/*
-	CFFPlayer *pPlayer = GetPlayerOwner();
-
-	if( !pPlayer )
-		return false;
-
-	if( pPlayer->GetSentryGun() )
-	{
-#ifdef CLIENT_DLL
-		ClientPrintMsg( pPlayer, HUD_PRINTCENTER, "#FF_BUILDERROR_SENTRYGUN_ALREADYBUILT" );
-#endif
-		return false;
-	}
-	else if( pPlayer->IsBuilding() )
-	{
-#ifdef CLIENT_DLL
-		ClientPrintMsg( pPlayer, HUD_PRINTCENTER, "#FF_BUILDERROR_MULTIPLEBUILDS" );
-#endif
-		return false;
-	}
-	else if( pPlayer->GetAmmoCount( AMMO_CELLS ) < 130 )
-	{
-#ifdef CLIENT_DLL
-		ClientPrintMsg( pPlayer, HUD_PRINTCENTER, "#FF_BUILDERROR_SENTRYGUN_NOTENOUGHAMMO" );
-#endif
-		return false;
-	}
-	*/
-
 	return BaseClass::CanDeploy();
 }
 
 bool CFFWeaponDeploySentryGun::CanBeSelected( void )
 {
-	/*CFFPlayer *pPlayer = GetPlayerOwner();
-
-	if( !pPlayer )
-		return false;
-
-	if( pPlayer->GetSentryGun() )
-		return false;
-	else if( pPlayer->IsBuilding() )
-		return false;
-	else if( pPlayer->GetAmmoCount( AMMO_CELLS ) < 130 )
-		return false;*/
-
 	return BaseClass::CanBeSelected();
 }
 

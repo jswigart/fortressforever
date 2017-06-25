@@ -1,22 +1,8 @@
-//	=============== Fortress Forever ==============
-//	======== A modification for Half-Life 2 =======
-//
-//	@file ff_hud_spydisguise.cpp
-//	@author Patrick O'Leary (Mulchman)
-//	@date 09/01/2006
-//	@brief Hud Disguise Indicator
-//
-//	REVISIONS
-//	---------
-//	09/01/2006, Mulchman: 
-//		First created
-
 #include "cbase.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "hud_macros.h"
 
-//#include <KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 
@@ -32,24 +18,23 @@
 
 using namespace vgui;
 
-//extern ConVar ffdev_overpressure_delay;
-#define OVERPRESSURE_COOLDOWN 16	//ffdev_overpressure_delay.GetFloat()
+#define JETPACK_MAXFUEL 100
 
 //-----------------------------------------------------------------------------
-// Purpose: Displays current disguised class
+// Purpose: Displays jetpack fuel remaining on the HUD
 //-----------------------------------------------------------------------------
-class CHudOverpressure : public CHudElement, public vgui::FFPanel
+class CHudJetpackFuelBar : public CHudElement, public vgui::FFPanel
 {
 public:
-	DECLARE_CLASS_SIMPLE( CHudOverpressure, vgui::FFPanel );
+	DECLARE_CLASS_SIMPLE( CHudJetpackFuelBar, vgui::FFPanel );
 
-	CHudOverpressure( const char *pElementName ) : vgui::FFPanel( NULL, "HudOverpressure" ), CHudElement( pElementName )
+	CHudJetpackFuelBar( const char *pElementName ) : vgui::FFPanel( NULL, "HudJetpackFuelBar" ), CHudElement( pElementName )
 	{
 		SetParent( g_pClientMode->GetViewport() );
 		SetHiddenBits( HIDEHUD_PLAYERDEAD | HIDEHUD_SPECTATING | HIDEHUD_UNASSIGNED );
 	}
 
-	virtual ~CHudOverpressure( void )
+	virtual ~CHudJetpackFuelBar( void )
 	{
 	}
 
@@ -59,7 +44,6 @@ public:
 protected:
 
 private:
-	// Stuff we need to know
 	CPanelAnimationVar( vgui::HFont, m_hTextFont, "TextFont", "HUD_TextSmall" );
 
 	CPanelAnimationVarAliasType( float, text1_xpos, "text1_xpos", "34", "proportional_float" );
@@ -68,7 +52,6 @@ private:
 	CPanelAnimationVarAliasType( float, image1_xpos, "image1_xpos", "2", "proportional_float" );
 	CPanelAnimationVarAliasType( float, image1_ypos, "image1_ypos", "4", "proportional_float" );
 
-	// For the disguising progress bar
 	CPanelAnimationVar( Color, m_BarColor, "HUD_Tone_Default", "HUD_Tone_Default" );
 	CPanelAnimationVarAliasType( float, bar_width, "bar_width", "75", "proportional_float" );
 	CPanelAnimationVarAliasType( float, bar_height, "bar_height", "24", "proportional_float" );
@@ -77,7 +60,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Done each map load
 //-----------------------------------------------------------------------------
-void CHudOverpressure::VidInit( void )
+void CHudJetpackFuelBar::VidInit( void )
 {
 	SetPaintBackgroundEnabled( false );
 }
@@ -85,7 +68,7 @@ void CHudOverpressure::VidInit( void )
 //-----------------------------------------------------------------------------
 // Purpose: Draw stuff!
 //-----------------------------------------------------------------------------
-void CHudOverpressure::Paint( void )
+void CHudJetpackFuelBar::Paint( void )
 {
 	if( !engine->IsInGame() )
 		return;
@@ -95,22 +78,15 @@ void CHudOverpressure::Paint( void )
 	if( !pPlayer )
 		return;
 
-	if( pPlayer->GetClassSlot() != CLASS_HWGUY || FF_IsPlayerSpec( pPlayer ) || !FF_HasPlayerPickedClass( pPlayer ) )
+	if( pPlayer->GetClassSlot() != CLASS_PYRO || FF_IsPlayerSpec( pPlayer ) || !FF_HasPlayerPickedClass( pPlayer ) )
 		return;
 
-	// Let's calculate and draw the disguising progress bar
-	if ( pPlayer->m_flNextClassSpecificSkill > gpGlobals->curtime )
-	{	
-		//New cloak percent timer -GreenMushy
-		float iProgressPercent = ( OVERPRESSURE_COOLDOWN - (pPlayer->m_flNextClassSpecificSkill - gpGlobals->curtime) ) / ( OVERPRESSURE_COOLDOWN );
-	
-		// Paint foreground/background stuff
-		BaseClass::PaintBackground();
+	BaseClass::PaintBackground();
 
-		// Draw progress bar
-		surface()->DrawSetColor( m_BarColor );
-		surface()->DrawFilledRect( image1_xpos, image1_ypos, image1_xpos + bar_width * iProgressPercent, image1_ypos + bar_height );
-	}
+	float iProgressPercent = pPlayer->m_flJetpackFuel / 100.0f;
+	surface()->DrawSetColor( m_BarColor );
+
+	surface()->DrawFilledRect( image1_xpos, image1_ypos, image1_xpos + bar_width * iProgressPercent, image1_ypos + bar_height );
 }
 
-DECLARE_HUDELEMENT(CHudOverpressure);
+DECLARE_HUDELEMENT(CHudJetpackFuelBar);

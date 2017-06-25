@@ -56,7 +56,7 @@ ConVar ffdev_mancannon_conc_speed_vert( "ffdev_mancannon_conc_speed_vert", "768"
 
 //ConVar conc_radius("ffdev_conc_radius", "280.0f", FCVAR_FF_FFDEV_REPLICATED, "Radius of grenade explosions");
 //ConVar conc_ragdoll_push("conc_ragdoll_push","600", FCVAR_FF_FFDEV_REPLICATED,"How much to push ragdolls");
-#define CONC_RAGDOLL_PUSH 600
+#define CONC_RAGDOLL_PUSH 0
 
 #define CONCUSSIONGRENADE_MODEL			"models/grenades/conc/conc.mdl"
 #define CONCUSSIONGRENADE_GLOW_SPRITE	"sprites/glow04_noz.vmt"
@@ -275,14 +275,13 @@ PRECACHE_WEAPON_REGISTER(ff_grenade_concussion);
 			// Some useful things to know
 			Vector vecDisplacement = pPlayer->GetAbsOrigin() - GetAbsOrigin();
 			float flDistance = vecDisplacement.Length();
-			Vector vecDir = vecDisplacement / flDistance;
 
 #ifdef GAME_DLL			
 			// Concuss the player first
 			if (g_pGameRules->FCanTakeDamage(pPlayer, pConcOwner))
 			{
 				QAngle angDirection;
-				VectorAngles(vecDir, angDirection);
+				VectorAngles(vecDisplacement, angDirection);
 
 				float flDuration = 10.0f;
 				float flIconDuration = flDuration;

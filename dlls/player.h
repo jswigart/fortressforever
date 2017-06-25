@@ -548,6 +548,7 @@ public:
 	int		FragCount() const		{ return m_iFrags; }
 	int		FortPointsCount() const		{ return m_iFortPoints; }
 	int		DeathCount() const		{ return m_iDeaths;}
+	int		AssistsCount() const	{ return m_iAssists; }
 	bool	IsConnected() const		{ return m_iConnected != PlayerDisconnected; }
 	bool	IsDisconnecting() const	{ return m_iConnected == PlayerDisconnecting; }
 	bool	IsSuitEquipped() const	{ return m_Local.m_bWearingSuit; }
@@ -573,6 +574,9 @@ public:
 
 	void	ResetFortPointsCount();
 	void	IncrementFortPointsCount( int nCount );
+
+	void	ResetAsisstsCount();
+	void	IncrementAssistsCount( int nCount );
 
 	void	SetArmorValue( int value );
 	void	IncrementArmorValue( int nCount, int nMaxValue = -1 );
@@ -684,7 +688,7 @@ public:
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_vecVelocity );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nWaterLevel );
 	
-	int						m_nButtons;
+	CNetworkVarForDerived( int, m_nButtons );
 	int						m_afButtonPressed;
 	int						m_afButtonReleased;
 	int						m_afButtonLast;
@@ -829,6 +833,7 @@ private:
 	int						m_iFrags;
 	int						m_iFortPoints;
 	int						m_iDeaths;
+	int						m_iAssists;
 
 	float					m_flNextDecalTime;// next time this player can spray a decal
 

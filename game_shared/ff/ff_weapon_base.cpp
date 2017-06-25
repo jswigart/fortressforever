@@ -54,6 +54,8 @@ const char *s_WeaponAliasInfo[] =
 
 	"railgun", 			// FF_WEAPON_RAILGUN
 
+	"jumpgun",			// FF_WEAPON_JUMPGUN
+
 	"tranq",		 	// FF_WEAPON_TRANQUILISER
 
 	"assaultcannon", 	// FF_WEAPON_ASSAULTCANNON
@@ -177,6 +179,7 @@ void CFFWeaponBase::WeaponSound(WeaponSound_t sound_type, float soundtime /* = 0
 //----------------------------------------------------------------------------
 void CFFWeaponBase::WeaponSoundLocal( WeaponSound_t sound_type, float soundtime )
 {
+#ifdef CLIENT_DLL 
 	// If we have some sounds from the weapon classname.txt file, play a random one of them
 	const char *shootsound = GetWpnData().aShootSounds[ sound_type ];
 	if( !shootsound || !shootsound[0] )
@@ -189,8 +192,7 @@ void CFFWeaponBase::WeaponSoundLocal( WeaponSound_t sound_type, float soundtime 
 
 	CSingleUserRecipientFilter filter( GetPlayerOwner() );
 
-#ifdef CLIENT_DLL 
-	if( GetPlayerOwner() == C_FFPlayer::GetLocalFFPlayer() )
+	if( GetPlayerOwner() == C_FFPlayer::GetLocalFFPlayerOrObserverTarget() )
 	{
 		// Not sure why we're checking tempents... but we did it above^^
 		if( !te->CanPredict() )
@@ -201,9 +203,7 @@ void CFFWeaponBase::WeaponSoundLocal( WeaponSound_t sound_type, float soundtime 
 
 		EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, NULL, soundtime );
 	}
-#else
-	EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, NULL, soundtime );
-#endif	
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -595,7 +595,7 @@ void CFFWeaponBase::ItemPostFrame()
 	bool bFired = false;
 
 	// Secondary attack has priority
-	if ((pOwner->m_nButtons & IN_ATTACK2) && (m_flNextSecondaryAttack <= gpGlobals->curtime))
+	if (HasAltFire() && (pOwner->m_nButtons & IN_ATTACK2) && (m_flNextSecondaryAttack <= gpGlobals->curtime))
 	{
 		if (UsesSecondaryAmmo() && pOwner->GetAmmoCount(m_iSecondaryAmmoType) <=0)
 		{

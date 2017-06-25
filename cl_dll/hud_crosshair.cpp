@@ -23,6 +23,7 @@
 ConVar crosshair( "crosshair", "1", FCVAR_ARCHIVE | FCVAR_CLIENTDLL);
 ConVar cl_observercrosshair( "cl_observercrosshair", "1", FCVAR_ARCHIVE | FCVAR_CLIENTDLL);
 ConVar cl_acchargebar("cl_acchargebar", "0", FCVAR_ARCHIVE | FCVAR_CLIENTDLL);
+ConVar cl_pyro_fuelbar("cl_pyro_fuelbar", "1", FCVAR_ARCHIVE | FCVAR_CLIENTDLL);
 
 //Tie crosshair values to cheats -GreenMushy
 ConVar cl_concaim("cl_concaim", "1", FCVAR_ARCHIVE | FCVAR_CLIENTDLL, "0 = always show crosshair in center. 1 = flash trueaim after shooting. 2 = hide crosshair when conced.");
@@ -218,7 +219,6 @@ void CHudCrosshair::Paint( void )
 		}
 	}
 
-
 	// --> Mirv: Crosshair stuff
 	//m_pCrosshair->DrawSelf( 
 	//		x - 0.5f * m_pCrosshair->Width(), 
@@ -297,6 +297,34 @@ void CHudCrosshair::Paint( void )
 	surface()->DrawUnicodeChar(unicode[0]);
 	// <-- Mirv
 
+	// Draw pyro fuel
+	if (cl_pyro_fuelbar.GetBool() && pActivePlayer->GetClassSlot() == CLASS_PYRO)
+	{
+		float fuelPercent = pActivePlayer->m_flJetpackFuel / 100.0f;
+
+		x = ScreenWidth()/2;
+		y = ScreenHeight()/2;
+
+		int iWidth = 32;
+		int iHeight = 10;
+		int iLeft = x - iWidth / 2;
+		int iTop = y + charOffsetY + 20;
+		int iRight = iLeft + (iWidth);
+		int iBottom = iTop + iHeight;
+		int iAlpha = 25 + (1.0f - fuelPercent * fuelPercent) * 200;
+		float flRightInner = iLeft + ((float)(iRight - iLeft) * (fuelPercent));
+
+		Color fuelBarColor = ColorFade( fuelPercent * 100, 0, 100, INTENSITYSCALE_COLOR_RED, INTENSITYSCALE_COLOR_GREEN );
+
+		surface()->DrawSetColor( fuelBarColor.r(), fuelBarColor.g(), fuelBarColor.b(), iAlpha );
+		surface()->DrawFilledRect( iLeft, iTop, flRightInner, iBottom );
+
+		surface()->DrawSetColor( outerCol.r(), outerCol.g(), outerCol.b(), min(255, iAlpha + 50) );		
+		surface()->DrawOutlinedRect( iLeft, iTop, iRight, iBottom );
+
+		surface()->DrawLine( flRightInner, iTop, flRightInner, iBottom );
+	}
+
 	// Mulch: Draw charge bar!
 	if( (weaponID == FF_WEAPON_ASSAULTCANNON) && (cl_acchargebar.GetBool()) )
 	{
@@ -332,6 +360,35 @@ void CHudCrosshair::Paint( void )
 
 		surface()->DrawSetColor( innerCol.r(), innerCol.g(), innerCol.b(), 150 );
 		surface()->DrawFilledRect( iLeft, iTop, iLeft + ((float)(iRight - iLeft) * (flCharge / 100.0f)), iBottom );
+
+		surface()->DrawSetColor( outerCol.r(), outerCol.g(), outerCol.b(), 200 );		
+		surface()->DrawOutlinedRect( iLeft, iTop, iRight, iBottom );
+	}
+	else if ( weaponID == FF_WEAPON_JUMPGUN )
+	{
+		extern float GetJumpgunCharge();
+		float flCharge = GetJumpgunCharge();
+		
+		if( flCharge <= 0.0f )
+			return;
+
+		x = ScreenWidth()/2;
+		y = ScreenHeight()/2;
+
+		int iLeft = x - charOffsetX;
+		int iTop = y + charOffsetY;
+		int iRight = iLeft + (charOffsetX * 2);
+		int iBottom = iTop + 10;
+
+		if ( flCharge == 1.0f )
+		{
+			surface()->DrawSetColor( 128, 255, 64, 150 );
+		}
+		else
+		{
+			surface()->DrawSetColor( innerCol.r(), innerCol.g(), innerCol.b(), 150 );
+		}
+		surface()->DrawFilledRect( iLeft, iTop, iLeft + ((float)(iRight - iLeft) * (flCharge)), iBottom );
 
 		surface()->DrawSetColor( outerCol.r(), outerCol.g(), outerCol.b(), 200 );		
 		surface()->DrawOutlinedRect( iLeft, iTop, iRight, iBottom );

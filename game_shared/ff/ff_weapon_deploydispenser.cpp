@@ -60,7 +60,6 @@ public:
 #endif
 
 	virtual void PrimaryAttack( void );
-	virtual void SecondaryAttack( void );
 	virtual void WeaponIdle( void );
 	virtual bool Holster(CBaseCombatWeapon *pSwitchingTo);
 	virtual bool CanBeSelected( void );
@@ -185,14 +184,6 @@ void CFFWeaponDeployDispenser::PrimaryAttack( void )
 }
 
 //----------------------------------------------------------------------------
-// Purpose: Handles whatever should be done when they scondary fire
-//----------------------------------------------------------------------------
-void CFFWeaponDeployDispenser::SecondaryAttack( void ) 
-{
-	m_flNextSecondaryAttack = gpGlobals->curtime;
-}
-
-//----------------------------------------------------------------------------
 // Purpose: Checks validity of ground at this point or whatever
 //----------------------------------------------------------------------------
 void CFFWeaponDeployDispenser::WeaponIdle( void ) 
@@ -304,27 +295,14 @@ bool CFFWeaponDeployDispenser::CanBeSelected( void )
 			return;
 		}
 
-		// Close enough to dismantle
-		if ((pPlayer->GetAbsOrigin() - pDispenser->GetAbsOrigin()).LengthSqr() < 6400.0f)
+		if (pDispenser->CloseEnoughToDismantle(pPlayer))
 		{
-			// Changed 130 to 65 because:
-			// Bug #0000333: Buildable Behavior (non build slot) while building
-			pPlayer->GiveAmmo(65.0f, AMMO_CELLS, true);
-
-			// Bug #0000426: Buildables Dismantle Sounds Missing
-			CPASAttenuationFilter sndFilter( pDispenser );
-			pDispenser->EmitSound( sndFilter, pDispenser->entindex(), "Dispenser.unbuild" );
-			// Fire an event.
-			IGameEvent *pEvent = gameeventmanager->CreateEvent("dispenser_dismantled");		
-			if(pEvent)
-			{
-				pEvent->SetInt("userid", pPlayer->GetUserID());
-				gameeventmanager->FireEvent(pEvent, true);
-			}
-			pDispenser->RemoveQuietly();
+            pDispenser->Dismantle(pPlayer);
 		}
 		else
-			ClientPrint(pPlayer, HUD_PRINTCENTER, "#FF_TOOFARAWAY");
+        {
+            ClientPrint(pPlayer, HUD_PRINTCENTER, "#FF_TOOFARAWAY");
+        }
 	}
 
 	CON_COMMAND(detdispenser, "Detonates dispenser")
@@ -408,30 +386,14 @@ bool CFFWeaponDeployDispenser::CanBeSelected( void )
 			return;
 		}
 
-		// Close enough to dismantle
 		//The previous IsBuilt function didnt seem to work so i removed it -GreenMushy
-		if ((pPlayer->GetAbsOrigin() - pDispenser->GetAbsOrigin()).LengthSqr() < 6400.0f )
+		if (pDispenser->CloseEnoughToDismantle(pPlayer))
 		{
-			// Changed 130 to 65 because:
-			// Bug #0000333: Buildable Behavior (non build slot) while building
-			pPlayer->GiveAmmo(65.0f, AMMO_CELLS, true);
-
-			// Bug #0000426: Buildables Dismantle Sounds Missing
-			CPASAttenuationFilter sndFilter( pDispenser );
-			pDispenser->EmitSound( sndFilter, pDispenser->entindex(), "Dispenser.unbuild" );
-
-			
-			// Fire an event.
-			IGameEvent *pEvent = gameeventmanager->CreateEvent("dispenser_dismantled");		
-			if(pEvent)
-			{
-				pEvent->SetInt("userid", pPlayer->GetUserID());
-				gameeventmanager->FireEvent(pEvent, true);
-			}
-			pDispenser->RemoveQuietly();
-
+            pDispenser->Dismantle(pPlayer);
 		}
 		else
+        {
 			pDispenser->Detonate();
+        }
 	}
 #endif

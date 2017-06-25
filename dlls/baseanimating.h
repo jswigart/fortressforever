@@ -266,7 +266,7 @@ public:
 	// Fire
 	virtual void Ignite( float flFlameLifetime, bool bNPCOnly = true, float flSize = 0.0f, bool bCalledByLevelDesigner = false );
 	virtual void Extinguish() { RemoveFlag( FL_ONFIRE ); }
-	bool IsOnFire() { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
+	bool IsOnFire() const { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
 	void Scorch( int rate, int floor );
 	void InputIgnite( inputdata_t &inputdata );
 

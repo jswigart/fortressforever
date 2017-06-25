@@ -99,12 +99,25 @@ struct LocationInfo
 #define SEM_ACCUMULATIVE		(1 << 1)
 #define SEM_HEALABLE			(1 << 2)
 
-enum eBurnType
+// add a simple way to keep track of recent attackers (by player owner for buildables) for assists
+struct RecentAttackerInfo
 {
-	BURNTYPE_NONE = 0,
-	BURNTYPE_FLAMETHROWER,
-	BURNTYPE_ICCANNON,
-	BURNTYPE_NALPALMGRENADE,
+	CHandle<CFFPlayer> hPlayer;
+	float totalDamage; // note: before armor scale. dont really care. just tracks raw damage received
+	float timestamp;
+
+	RecentAttackerInfo(CFFPlayer *pPlayer, float dmg, float ts)
+	{
+		hPlayer = pPlayer;
+		totalDamage = dmg;
+		timestamp = ts;
+	}
+
+	/* debugging
+	~RecentAttackerInfo( ) 
+	{
+		//
+	}*/
 };
 
 class CFFRagdoll : public CBaseAnimatingOverlay
@@ -235,8 +248,7 @@ private:
 	IFFPlayerAnimState *m_PlayerAnimState;
 
 	// ---> FF class stuff (billdoor)
-	CNetworkVar(int, m_iArmorType);
-	int m_iBaseArmorType;
+	int m_iArmorType;
 
 	// BEG: Added by Mulchman for armor stuff
 public:
@@ -379,7 +391,7 @@ protected:
 	// Origin of where we started to build at
 	Vector m_vecBuildOrigin;
 
-	CFFWeaponBase *m_pBuildLastWeapon;
+	CFFWeaponBase *m_pLastWeapon;
 
 public:
 	bool AnyActiveDispenserSabotages() const { return (m_iActiveSabotages & 1); }
@@ -395,6 +407,8 @@ public:
 	CFFSentryGun *GetSentryGun( void ) const;
 	CFFManCannon *GetManCannon( void ) const;
 	CFFBuildableObject *GetBuildable( int iBuildable ) const;
+	CFFWeaponBase* GetLastFFWeapon(){ return m_pLastWeapon; }
+	void SetLastFFWeapon( CFFWeaponBase* _pLastWeapon ){ m_pLastWeapon = _pLastWeapon; }
 
 	void PreBuildGenericThink( void );	// *** NOT AN ACTUAL THINK FUNCTION ***
 	void PostBuildGenericThink( void );	// *** NOT AN ACTUAL THINK FUNCTION ***
@@ -524,8 +538,10 @@ protected:
 public:
 	bool Infect( CFFPlayer *pPlayer );
 	bool Cure( CFFPlayer *pPlayer );
-	void ApplyBurning( CFFPlayer *hIgniter, float scale = 1.0f, float flIconDuration = 10.0f, eBurnType BurnType = BURNTYPE_NONE);
-	bool IsBurning( void ) const { return m_bBurnFlagNG|m_bBurnFlagFT|m_bBurnFlagIC; }
+
+	// New pyro burn functions
+	int GetBurnLevel( void ) const { return m_iBurnLevel; }
+	void IncreaseBurnLevel( int iAmount );
 
 	void Gas( float flDuration, float flIconDuration, CFFPlayer *pGasser);
 	bool IsGassed( void ) const { return m_bGassed; }
@@ -560,6 +576,8 @@ public:
 	bool GetSpecialInfectedDeath( void ) const { return m_bSpecialInfectedDeath; }
 	void SetSpecialInfectedDeath( void ) { m_bSpecialInfectedDeath = true; }
 
+	bool IsJetpacking( void ) const		{ return m_bJetpacking; }
+
 	int m_iSabotagedSentries;
 	int m_iSabotagedDispensers;
 
@@ -575,6 +593,7 @@ private:
 	CNetworkVar( int, m_iActiveSabotages );			// Jiggles: So the client's sabotage menu knows when to be active
 	CNetworkVar( int, m_iSpyDisguising );			// Jiggles: So the spy HUD can calculate disguise progress
 	CNetworkVar( int, m_iInfectTick );				// infection : number of infection ticks that have occured -Green Mushy
+	CNetworkVar( bool, m_bJetpacking );
 	float m_flImmuneTime;							// Mulch: immunity: time in the future of when the immunity ends
 	int m_iInfectedTeam;							// Mulch: team the medic who infected us was on
 	float m_fNextInfectedTickDamage;				// Infection damage to deal the next tick
@@ -587,20 +606,10 @@ private:
 	// get to gamerules. If we didn't have to note this properly in
 	// a hud death msg (and logs) it'd be a lot easier.
 	bool m_bSpecialInfectedDeath; 
-public:	
 
-	CFFPlayer *GetIgniter( void );
 private:
 
-	EHANDLE m_hIgniter;			// Wrap this cause the guy can leave the server!
-	 float m_flNextBurnTick;   // when the next burn tick should fire
-	int m_iBurnTicks;         // how many more ticks are left to fire
-	float m_flBurningDamage;  // how much total damage is left to take
-	eBurnType m_BurnType;		 //type of burning damage
-
-	bool m_bBurnFlagNG; // AfterShock - burning flags for multiplying flames and damage for combos!
-	bool m_bBurnFlagFT;
-	bool m_bBurnFlagIC;
+	int m_iBurnLevel;
 
 	void StatusEffectsThink( void );
 	void RecalculateSpeed( );
@@ -701,9 +710,6 @@ private:
 	// Time until player can cloak again
 	float m_flNextCloak;
 	
-	// time before allowed to scream again
-	float m_flScreamTime;
-	
 	// Shared stuffs:
 public:
 	void Command_SpyCloak( void );
@@ -715,6 +721,10 @@ private:
 	CNetworkVar( unsigned int, m_iCloaked );
 public:
 	void Overpressure( void );
+	bool CanJetpack( void );
+	void JetpackHold( void );
+	void JetpackRechargeThink( void );
+	void SharedPreThink( void );
 
 public:	
 	// Will uncloak you (w/o going the Command_ route)
@@ -762,9 +772,12 @@ public:
 	void UpdateCamera( bool bUnassigned );
 
 	void ClassSpecificSkill();
+	void ClassSpecificSkillHold();
 	void ClassSpecificSkill_Post();
 
 	CNetworkVar( float, m_flNextClassSpecificSkill );
+	CNetworkVar( float, m_flJetpackFuel );
+	float m_flJetpackNextFuelRechargeTime;
 
 	CNetworkVar( float, m_flConcTime );
 	void UnConcuss( void );
@@ -772,6 +785,8 @@ public:
 	
 	CNetworkVar( float, m_flTrueAimTime );
 	CNetworkVar( float, m_flHitTime );
+
+	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nButtons );
 
 	CNetworkVar( int, m_iClassStatus );
 	int GetClassForClient() const { return (0x0000000F & m_iClassStatus); }
@@ -790,7 +805,8 @@ public:
 	//float m_flNextSpawnDelay;
 
 	virtual int TakeEmp();
-	virtual void Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner );
+	virtual void Ignite( bool bNPCOnly, float flSize, bool bCalledByLevelDesigner, float flameLifetime );
+	virtual void Ignite( bool bNPCOnly, float flSize, bool bCalledByLevelDesigner );
 
 	void SetFlameSpritesLifetime(float flLifeTime, float flFlameSize = 1.0f);
 
@@ -1007,8 +1023,17 @@ private:
 	CNetworkHandle( CBaseEntity, m_hObjectiveEntity );
 	// Location of player's current objective (also set by Lua)
 	CNetworkVector( m_vecObjectiveOrigin );
-};
 
+	// kill assist stuff
+	// added for kill assists tracking
+	CUtlVector<RecentAttackerInfo> m_recentAttackers;
+	void AddRecentAttacker( const CTakeDamageInfo &dmgInfo );
+	// actually dont bother. we check timestamps when queried
+	//void UpdateRecentAttackers( );
+public:
+	RecentAttackerInfo* GetTopKillAssister( CBasePlayer *killerToIgnore );
+	void RemoveMeFromKillAssists( );
+};
 
 inline CFFPlayer *ToFFPlayer( CBaseEntity *pEntity )
 {

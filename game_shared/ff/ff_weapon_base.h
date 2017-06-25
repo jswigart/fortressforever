@@ -137,6 +137,9 @@ typedef enum
 	// Engineer specific
 	FF_WEAPON_RAILGUN, 
 
+	// Scout specific
+	FF_WEAPON_JUMPGUN,
+
 	// Spy specific
 	FF_WEAPON_TRANQUILISER, 
 
@@ -200,6 +203,7 @@ public:
 
 	// All FF weapons are predicted
 	virtual bool		IsPredicted() const { return true; }
+	virtual bool		HasAltFire() const { return false; }
 
 	// All predicted weapons need to implement and return true
 	virtual FFWeaponID	GetWeaponID() const { AssertMsg(0, "GetWeaponID() not defined for weapon"); return FF_WEAPON_NONE; }
