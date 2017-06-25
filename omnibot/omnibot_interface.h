@@ -7,6 +7,8 @@ class CFFInfoScript;
 #include "FF_Config.h"
 #include "TF_Messages.h"
 
+#include "luabind/luabind.hpp"
+
 class omnibot_interface
 {
 public:
@@ -94,26 +96,8 @@ public:
 	static void Notify_GaveSpannerArmor( CBasePlayer *_engy, CBasePlayer *_target, int _before, int _after );
 	static void Notify_GotMedicHealth( CBasePlayer *_target, CBasePlayer *_medic, int _before, int _after );
 	static void Notify_GaveMedicHealth( CBasePlayer *_medic, CBasePlayer *_target, int _before, int _after );
-
 	static void Notify_GotDispenserAmmo( CBasePlayer *_player );
-
 	static void Notify_Sound( CBaseEntity *_source, int _sndtype, const char *_name );
-
-	// Goal Stuff
-	enum BotGoalTypes
-	{
-		kNone,
-		kBackPack_Ammo,
-		kBackPack_Armor,
-		kBackPack_Health,
-		kBackPack_Grenades,
-		kFlag,
-		kFlagCap,
-		kHuntedEscape,
-		kTrainerSpawn,
-	};
-	static void Notify_GoalInfo( CBaseEntity *_entity, int _type, int _teamflags );
-
 	static void Notify_ItemRemove( CBaseEntity *_entity );
 	static void Notify_ItemRestore( CBaseEntity *_entity );
 	static void Notify_ItemDropped( CBaseEntity *_entity );
@@ -125,6 +109,8 @@ public:
 
 	static void BotSendTriggerEx( const char *_entityname, const char *_action );
 	static void SendBotSignal( const char *_signal );
+
+	static void ParseEntityInfo( EntityInfo& entInfo, const luabind::adl::object& table );
 };
 
 #endif

@@ -237,15 +237,14 @@ bool CFFTriggerClip::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	{
 		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
 
-		classInfo.mTeamMask = 0;
 		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMBLUE ) )
-			classInfo.mTeamMask = 1<<0;
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
 		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMRED ) )
-			classInfo.mTeamMask = 1<<1;
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
 		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMYELLOW ) )
-			classInfo.mTeamMask = 1<<2;
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
 		if ( IsClipMaskSet( LUA_CLIP_FLAG_TEAMGREEN ) )
-			classInfo.mTeamMask = 1<<3;
+			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
 	}
 	else if ( IsClipMaskSet( LUA_CLIP_FLAG_PLAYERSBYTEAM ) )
 	{

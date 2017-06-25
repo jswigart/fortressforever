@@ -891,7 +891,21 @@ bool CFFManCannon::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
 
-	classInfo.mTeamMask = 1 << GetTeamNumber();
+	switch( GetTeamNumber() )
+	{
+	case TEAM_BLUE:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
+		break;
+	case TEAM_RED:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
+		break;
+	case TEAM_YELLOW:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
+		break;
+	case TEAM_GREEN:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
+		break;
+	}
 
 	return true;
 }

@@ -29,6 +29,10 @@ public:
 	void InputUnlock( inputdata_t &inputdata );
 	void InputPress( inputdata_t &inputdata );
 
+#if(USE_OMNIBOT)
+	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
+#endif
+
 protected:
 
 	void ButtonActivate( );

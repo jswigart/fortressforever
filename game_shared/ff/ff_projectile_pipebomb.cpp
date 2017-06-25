@@ -391,7 +391,16 @@ bool CFFProjectilePipebomb::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	
 	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
 
-	classInfo.mNavFlags = NAVFLAGS_THREAT_LVL3;
+	switch( GetTeamNumber() )
+	{
+	case TEAM_BLUE:
+	case TEAM_RED:
+	case TEAM_YELLOW:
+	case TEAM_GREEN:
+
+		break;
+	}
+	//classInfo.mNavFlags = NAVFLAGS_THREAT_LVL3;
 
 	return true;
 }

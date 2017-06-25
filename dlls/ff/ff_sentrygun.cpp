@@ -1992,32 +1992,18 @@ bool CFFSentryGun::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mGroup = ENT_GRP_BUILDABLE;
 	classInfo.mClassId = TF_CLASSEX_SENTRY;
 
-	classInfo.mQuantity.Set( GetLevel(), 3 );
+	classInfo.mLevel = GetLevel();
 
 	classInfo.mCategory.SetFlag( ENT_CAT_SHOOTABLE );
 	classInfo.mCategory.SetFlag( ENT_CAT_AUTODEFENSE );
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 
-	classInfo.mAmmo1.Set( m_iShells, m_iMaxShells );
-	classInfo.mAmmo2.Set( m_iRockets, m_iMaxRockets );
+	classInfo.mAmmo[0].Set( m_iShells, m_iMaxShells );
+	classInfo.mAmmo[1].Set( m_iRockets, m_iMaxRockets );
 
 	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
 
-	switch( GetLevel() )
-	{
-	case 1:
-		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
-		break;
-	case 2:
-		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL2;
-		break;
-	case 3:
-		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL3;
-		break;
-	default:
-		classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
-		break;
-	}
+	classInfo.mNavFlags = NAVFLAGS_DESTRUCTIBLE;
 
 	if ( !IsBuilt() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
@@ -2030,7 +2016,21 @@ bool CFFSentryGun::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
 
-	classInfo.mTeamMask = 1 << GetTeamNumber();
+	switch( GetTeamNumber() )
+	{
+	case TEAM_BLUE:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
+		break;
+	case TEAM_RED:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
+		break;
+	case TEAM_YELLOW:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
+		break;
+	case TEAM_GREEN:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
+		break;
+	}
 
 	return true;
 }

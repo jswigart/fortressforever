@@ -120,15 +120,15 @@ void CFFLuaLib::InitBase(lua_State* L)
 			.def("GetOrigin",			&CFFInfoScript::LUA_GetOrigin)
 			.def("SetOrigin",			&CFFInfoScript::LUA_SetOrigin)
 			.def("GetAngles",			&CFFInfoScript::LUA_GetAngles)
-			.def("SetAngles",			&CFFInfoScript::LUA_SetAngles)
-			.def("SetBotGoalInfo",		&CFFInfoScript::SetBotGoalInfo)
+			.def("SetAngles",			&CFFInfoScript::LUA_SetAngles)			
 			.def("SetModel",			&CFFInfoScript::LUA_SetModel) // Leave this!
 			.def("SetStartOrigin",		&CFFInfoScript::LUA_SetStartOrigin)
 			.def("SetStartAngles",		&CFFInfoScript::LUA_SetStartAngles)
 			.def("SetTouchFlags",		&CFFInfoScript::SetTouchFlags)
 			.def("SetDisallowTouchFlags",&CFFInfoScript::SetDisallowTouchFlags)
 			.def("GetAngularVelocity",	&CFFInfoScript::GetLocalAngularVelocity)
-			.def("SetAngularVelocity",	&CFFInfoScript::SetLocalAngularVelocity),
+			.def("SetAngularVelocity",	&CFFInfoScript::SetLocalAngularVelocity)
+			.def("SetBotEntityInfo",	&CFFInfoScript::SetBotEntityInfo),
 
 		// CFuncFFScript - trigger_ff_script
 		class_<CFuncFFScript>("TriggerScript")
@@ -138,8 +138,8 @@ void CFFLuaLib::InitBase(lua_State* L)
 			.def("Remove",				&CFuncFFScript::LuaRemove)
 			.def("Restore",				&CFuncFFScript::LuaRestore)
 			.def("IsTouching",			&CFuncFFScript::IsTouching)
-			//.def("SetLocation",			&CFuncFFScript::LuaSetLocation)
-			.def("SetBotGoalInfo",		&CFuncFFScript::SetBotGoalInfo),
+			//.def("SetLocation",		&CFuncFFScript::LuaSetLocation)
+			.def("SetBotEntityInfo",	&CFuncFFScript::SetBotEntityInfo),
 
 		class_<CFFTriggerClip>("TriggerClip")
 			.def("SetClipFlags",		&CFFTriggerClip::LUA_SetClipFlags)

@@ -136,10 +136,6 @@ CFFInfoScript::CFFInfoScript( void )
 
 	m_allowTouchFlags = 0;
 	m_disallowTouchFlags = 0;
-
-	// bot info
-	m_BotTeamFlags = 0;
-	m_BotGoalType = omnibot_interface::kNone;
 }
 
 //-----------------------------------------------------------------------------
@@ -1221,27 +1217,6 @@ void CFFInfoScript::RemoveThink( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CFFInfoScript::SetBotGoalInfo(int _type)
-{
-	m_BotGoalType = _type;
-	m_BotTeamFlags = 0;
-
-	if(m_allowTouchFlags & kAllowBlueTeam && !(m_disallowTouchFlags & kAllowBlueTeam))
-		m_BotTeamFlags |= (1<<TF_TEAM_BLUE);
-	if(m_allowTouchFlags & kAllowRedTeam && !(m_disallowTouchFlags & kAllowRedTeam))
-		m_BotTeamFlags |= (1<<TF_TEAM_RED);
-	if(m_allowTouchFlags & kAllowYellowTeam && !(m_disallowTouchFlags & kAllowYellowTeam))
-		m_BotTeamFlags |= (1<<TF_TEAM_YELLOW);
-	if(m_allowTouchFlags & kAllowGreenTeam && !(m_disallowTouchFlags & kAllowGreenTeam))
-		m_BotTeamFlags |= (1<<TF_TEAM_GREEN);
-
-	// FF TODO: Sorry DrEvil, I'm too tired right now to add the class touch flags as well. - Jon
-	omnibot_interface::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
 CBaseEntity *CFFInfoScript::GetCarrier( void )
 {
 	return IsCarried() ? GetFollowedEntity() : NULL;
@@ -1389,50 +1364,28 @@ void CFFInfoScript::PhysicsSimulate()
 		DrawBBoxOverlay();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CFFInfoScript::SetBotEntityInfo( const luabind::adl::object& table )
+{
+	omnibot_interface::ParseEntityInfo( mBotInfo, table );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 #if(USE_OMNIBOT)
 bool CFFInfoScript::GetOmnibotEntityType( EntityInfo& classInfo ) const
 {
-	BaseClass::GetOmnibotEntityType( classInfo );
+	classInfo = mBotInfo;
 
-	switch( m_BotGoalType )
-	{
-	case omnibot_interface::kNone:
-		return false;
-	case omnibot_interface::kBackPack_Ammo:
-		classInfo.mGroup = ENT_GRP_AMMO1;
-		break;
-	case omnibot_interface::kBackPack_Armor:
-		classInfo.mGroup = ENT_GRP_ARMOR;
-		break;
-	case omnibot_interface::kBackPack_Health:
-		classInfo.mGroup = ENT_GRP_HEALTH;
-		break;
-	case omnibot_interface::kBackPack_Grenades:
-		break;
-	case omnibot_interface::kFlag:
-		classInfo.mGroup = ENT_GRP_FLAG;
-		break;
-	case omnibot_interface::kFlagCap:
-		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
-		break;
-	case omnibot_interface::kHuntedEscape:
-		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
-		break;
-	case omnibot_interface::kTrainerSpawn:
-		return false;
-	}
+	BaseClass::GetOmnibotEntityType( classInfo );
 	
-	if ( m_BotTeamFlags != 0 )
-	{
-		if ( m_BotTeamFlags & (1<<TF_TEAM_BLUE) )
-			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
-		if ( m_BotTeamFlags & (1<<TF_TEAM_RED) )
-			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
-		if ( m_BotTeamFlags & (1<<TF_TEAM_YELLOW) )
-			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
-		if ( m_BotTeamFlags & (1<<TF_TEAM_GREEN) )
-			classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
-	}
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1, m_allowTouchFlags & kAllowBlueTeam && !(m_disallowTouchFlags & kAllowBlueTeam) );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2, m_allowTouchFlags & kAllowRedTeam && !(m_disallowTouchFlags & kAllowRedTeam) );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3, m_allowTouchFlags & kAllowYellowTeam && !(m_disallowTouchFlags & kAllowYellowTeam) );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4, m_allowTouchFlags & kAllowGreenTeam && !(m_disallowTouchFlags & kAllowGreenTeam) );
 
 	return true;
 }

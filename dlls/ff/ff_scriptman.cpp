@@ -744,7 +744,7 @@ void CFFScriptManager::LuaWarning( const char *pszFormat, ... )
 	Q_vsnprintf(string, sizeof(string), pszFormat, argptr);
 	va_end (argptr);
 
-	Warning("[SCRIPT] %s", string );
+	Warning( "[SCRIPT] %s", string );
 }
 
 CON_COMMAND( lua_dostring, "Run a server-side Lua string in the global environment" )

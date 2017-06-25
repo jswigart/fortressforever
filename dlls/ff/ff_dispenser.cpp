@@ -679,16 +679,14 @@ bool CFFDispenser::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	classInfo.mCategory.SetFlag( ENT_CAT_OBSTACLE );
 
 	classInfo.mArmor.Set( m_iArmor, 500 );
-	classInfo.mQuantity.Set( m_iAmmoPercent, 100 );
-
-	classInfo.mAmmo1.Set( m_iCells, m_iMaxCells );
-	classInfo.mAmmo2.Set( m_iShells, m_iMaxShells );
-	classInfo.mAmmo2.Set( m_iNails, m_iMaxNails );
-	classInfo.mAmmo4.Set( m_iRockets, m_iMaxRockets );
+	classInfo.mAmmo[0].Set( m_iCells, m_iMaxCells );
+	classInfo.mAmmo[1].Set( m_iShells, m_iMaxShells );
+	classInfo.mAmmo[2].Set( m_iNails, m_iMaxNails );
+	classInfo.mAmmo[3].Set( m_iRockets, m_iMaxRockets );
 
 	classInfo.mFlags.SetFlag( ENT_FLAG_USEBOUNDS );
 
-	classInfo.mNavFlags = NAVFLAGS_THREAT_LVL1;
+	classInfo.mNavFlags = NAVFLAGS_DESTRUCTIBLE;
 
 	if ( !IsBuilt() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_BUILDINPROGRESS );
@@ -701,8 +699,21 @@ bool CFFDispenser::GetOmnibotEntityType( EntityInfo& classInfo ) const
 	if ( IsSabotaged() )
 		classInfo.mFlags.SetFlag( TF_ENT_FLAG_SABOTAGED );
 
-	classInfo.mTeamMask = 1 << GetTeamNumber();
-
+	switch( GetTeamNumber() )
+	{
+	case TEAM_BLUE:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
+		break;
+	case TEAM_RED:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
+		break;
+	case TEAM_YELLOW:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
+		break;
+	case TEAM_GREEN:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
+		break;
+	}
 	return true;
 }
 #endif

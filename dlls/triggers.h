@@ -180,8 +180,6 @@ public:
 	virtual void	Spawn( void );
 	virtual int		UpdateTransmitState( void );
 
-	void SetBotGoalInfo(int _type, int _team);
-
 	virtual void	LuaRestore( void )			{ SetRestored(); SetInactive(); Enable(); }
 	virtual void	LuaRemove( void )			{ SetRemoved(); Disable(); }
 	virtual void	LuaSetLocation();
@@ -193,9 +191,7 @@ public:
 	virtual void	SetRemoved( void );
 	virtual void	SetRestored( void );
 
-	// bot info accessors
-	int GetBotTeamFlags() const { return m_BotTeamFlags; }
-	int GetBotGoalType() const { return m_BotGoalType; }
+	void SetBotEntityInfo( const luabind::adl::object& table );
 
 #if(USE_OMNIBOT)
 	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
@@ -206,8 +202,7 @@ protected:
 	int m_iClipMask;
 
 	// cached information for bot use
-	int		m_BotTeamFlags;
-	int		m_BotGoalType;
+	EntityInfo		mBotInfo;
 };
 
 #endif // TRIGGERS_H

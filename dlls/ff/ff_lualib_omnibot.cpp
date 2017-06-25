@@ -29,7 +29,7 @@ extern "C"
 using namespace luabind;
 
 //---------------------------------------------------------------------------
-class Omnibot_GoalTypes
+class Omnibot_Groups
 {
 public:
 };
@@ -43,18 +43,16 @@ void CFFLuaLib::InitOmnibot(lua_State* L)
 		def("SendBotTrigger",		&omnibot_interface::BotSendTriggerEx),
 		def("SendBotSignal",		(void(*)(const char*))&omnibot_interface::SendBotSignal),
 
-		class_<Omnibot_GoalTypes>("Bot")
-			.enum_("GoalType")
+		class_<Omnibot_Groups>("Bot")
+			.enum_("GroupType")
 			[
-				value("kNone",				omnibot_interface::kNone),
-				value("kBackPack_Ammo",		omnibot_interface::kBackPack_Ammo),
-				value("kBackPack_Armor",	omnibot_interface::kBackPack_Armor),
-				value("kBackPack_Health",	omnibot_interface::kBackPack_Health),
-				value("kBackPack_Grenades",	omnibot_interface::kBackPack_Grenades),
-				value("kFlag",				omnibot_interface::kFlag),
-				value("kFlagCap",			omnibot_interface::kFlagCap),				
-				value("kTrainerSpawn",		omnibot_interface::kTrainerSpawn),
-				value("kHuntedEscape",		omnibot_interface::kHuntedEscape)
+				value("GRP_UNKNOWN",		ENT_GRP_UNKNOWN),
+				value("GRP_RESUPPLY",		ENT_GRP_RESUPPLY),
+				value("GRP_FLAG",			ENT_GRP_FLAG),
+				value("GRP_FLAGCAPPOINT",	ENT_GRP_FLAGCAPPOINT),
+				value("GRP_CONTROLPOINT",	ENT_GRP_CONTROLPOINT),
+				value("GRP_BUTTON",			ENT_GRP_BUTTON),				
+				value("GRP_GOAL",			ENT_GRP_GOAL)
 			]
 	];
 };

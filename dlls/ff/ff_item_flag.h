@@ -143,11 +143,11 @@ public:
 	bool			HasAnimations( void ) const { return m_bHasAnims; }
 	virtual Class_T	Classify( void ) { return CLASS_INFOSCRIPT; }
 
+	void SetBotEntityInfo(const luabind::adl::object& table);
+
 #if(USE_OMNIBOT)
 	bool GetOmnibotEntityType( EntityInfo& classInfo ) const;
 #endif
-
-	void SetBotGoalInfo(int _type);
 
 	// returns the criteria necessary for another entity to "touch" this entity
 	int GetTouchFlags( void ) const { return m_allowTouchFlags; }
@@ -164,10 +164,6 @@ public:
 
 	virtual void	ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity );
 	virtual void	PhysicsSimulate( void );
-
-	// bot info accessors
-	int GetBotTeamFlags() const { return m_BotTeamFlags; }
-	int GetBotGoalType() const { return m_BotGoalType; }
 protected:
 	// Do not expose these to LUA!
 	virtual void	SetActive( void );
@@ -226,8 +222,7 @@ protected:
 	int		m_disallowTouchFlags;
 
 	// cached information for bot use
-	int		m_BotTeamFlags;
-	int		m_BotGoalType;
+	EntityInfo		mBotInfo;
 };
 
 /////////////////////////////////////////////////////////////////////////////

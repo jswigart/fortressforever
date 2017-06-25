@@ -7546,6 +7546,22 @@ CBaseCombatWeapon *CFFPlayer::GetWeaponForSlot(int iSlot)
 
 	return NULL;
 }
+void CFFPlayer::GetWeaponsByWeight( CBaseCombatWeapon *& primary, CBaseCombatWeapon *& secondary )
+{
+	int bestWeight = -1;
+
+	primary = secondary = NULL;
+	for ( int weaponId = 0; weaponId < MAX_WEAPONS; weaponId++ )
+	{
+		CBaseCombatWeapon * weapon = GetWeapon( weaponId );
+		if ( weapon && weapon->GetWeight() > bestWeight )
+		{
+			bestWeight = weapon->GetWeight();
+			secondary = primary;
+			primary = weapon;
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Add armour, ensure that armour type is reset
@@ -8178,7 +8194,21 @@ bool CFFPlayer::GetOmnibotEntityType( EntityInfo& classInfo ) const
 		}
 	}
 
-	classInfo.mTeamMask = 1<<GetTeamNumber();
+	switch( GetTeamNumber() )
+	{
+	case TEAM_BLUE:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1 );
+		break;
+	case TEAM_RED:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2 );
+		break;
+	case TEAM_YELLOW:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3 );
+		break;
+	case TEAM_GREEN:
+		classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4 );
+		break;
+	}
 
 	return true;
 }

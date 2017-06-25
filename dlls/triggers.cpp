@@ -1152,6 +1152,7 @@ bool CTriggerMultiple::GetOmnibotEntityType( EntityInfo& classInfo ) const
 
 	if ( !m_bDisabled )
 	{
+		classInfo.mFlags.SetFlag( ENT_FLAG_DISABLED, false );
 		classInfo.mFlags.SetFlag( ENT_FLAG_COLLIDABLE );
 	}
 	return true;
@@ -1168,11 +1169,7 @@ LINK_ENTITY_TO_CLASS( trigger_ff_script, CFuncFFScript );
 //-----------------------------------------------------------------------------
 CFuncFFScript::CFuncFFScript()
 {
-	m_iGoalState = GS_INACTIVE; 
-
-	// bot info
-	m_BotTeamFlags = 0;
-	m_BotGoalType = omnibot_interface::kNone;
+	m_iGoalState = GS_INACTIVE;
 }
 
 //-----------------------------------------------------------------------------
@@ -1250,72 +1247,27 @@ void CFuncFFScript::LuaSetLocation()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CFuncFFScript::SetBotGoalInfo(int _type, int _team)
+void CFuncFFScript::SetBotEntityInfo( const luabind::adl::object& table )
 {
-	m_BotGoalType = _type;
-	m_BotTeamFlags = 0;
-	const int iAllTeams = 
-		(1<<TF_TEAM_BLUE)|
-		(1<<TF_TEAM_RED)|
-		(1<<TF_TEAM_YELLOW)|
-		(1<<TF_TEAM_GREEN);
-	switch(_team)
-	{
-	case 0:
-		m_BotTeamFlags = iAllTeams;
-		break;
-	case TEAM_BLUE:
-		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_BLUE);
-		break;
-	case TEAM_RED:
-		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_RED);
-		break;
-	case TEAM_YELLOW:
-		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_YELLOW);
-		break;
-	case TEAM_GREEN:
-		m_BotTeamFlags = iAllTeams & ~(1<<TF_TEAM_GREEN);
-		break;
-	}
-	omnibot_interface::Notify_GoalInfo(this, m_BotGoalType, m_BotTeamFlags);
+	omnibot_interface::ParseEntityInfo( mBotInfo, table );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 #if(USE_OMNIBOT)
 bool CFuncFFScript::GetOmnibotEntityType( EntityInfo& classInfo ) const
 {
+	classInfo = mBotInfo;
+
 	BaseClass::GetOmnibotEntityType( classInfo );
 	
-	// clear the trigger from the parent
-	classInfo.mGroup = ENT_GRP_UNKNOWN;
+	classInfo.mGroup = mBotInfo.mGroup;
 
-	switch( m_BotGoalType )
-	{
-	case omnibot_interface::kBackPack_Ammo:
-		classInfo.mGroup = ENT_GRP_AMMO1;
-		break;
-	case omnibot_interface::kBackPack_Armor:
-		classInfo.mGroup = ENT_GRP_ARMOR;
-		break;
-	case omnibot_interface::kBackPack_Health:
-		classInfo.mGroup = ENT_GRP_HEALTH;
-		break;
-	case omnibot_interface::kBackPack_Grenades:
-		break;
-	case omnibot_interface::kFlag:
-		classInfo.mGroup = ENT_GRP_FLAG;
-		break;
-	case omnibot_interface::kFlagCap:
-		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
-		break;
-	case omnibot_interface::kHuntedEscape:
-		classInfo.mGroup = ENT_GRP_FLAGCAPPOINT;
-		break;		
-	case omnibot_interface::kTrainerSpawn:
-	case omnibot_interface::kNone:
-	default:
-		classInfo.mCategory.ClearAll();
-		return false;
-	}
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM1, true );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM2, true );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM3, true );
+	classInfo.mFlags.SetFlag( ENT_FLAG_TEAM4, true );
 
 	return true;
 }

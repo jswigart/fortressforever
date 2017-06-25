@@ -428,8 +428,6 @@ public:
 	{
 		OB_GETMSG( Msg_Addbot );
 
-		int iClientNum = -1;
-
 		edict_t *pEdict = engine->CreateFakeClient( pMsg->mName );
 		if ( !pEdict )
 		{
@@ -439,30 +437,15 @@ public:
 
 		// Allocate a player entity for the bot, and call spawn
 		CBasePlayer *pPlayer = ( (CBasePlayer*)CBaseEntity::Instance( pEdict ) );
-
-		/*CFFPlayer *pFFPlayer = ToFFPlayer( pPlayer );
-		if ( pFFPlayer && pMsg->mSpawnPointName[ 0 ] )
-		{
-			CBaseEntity *pSpawnPt = gEntList.FindEntityByName( NULL, pMsg->mSpawnPointName );
-			if ( pSpawnPt )
-				pFFPlayer->m_SpawnPointOverride = pSpawnPt;
-			else
-				Warning( "Bot Spawn Point Not Found: %s", pMsg->mSpawnPointName );
-		}*/
-
 		pPlayer->ClearFlags();
 		pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
-
 		pPlayer->ChangeTeam( TEAM_UNASSIGNED );
 		pPlayer->RemoveAllItems( true );
 		pPlayer->Spawn();
-
-		// Get the index of the bot.
-		iClientNum = engine->IndexOfEdict( pEdict );
-
+		
 		//////////////////////////////////////////////////////////////////////////
 		// Success!, return its client num.
-		return iClientNum;
+		return engine->IndexOfEdict( pEdict );
 	}
 
 	void RemoveBot( const MessageHelper &_data )
@@ -1509,34 +1492,43 @@ public:
 		return InvalidEntity;
 	}
 
-	obResult GetCurrentAmmo( const GameEntity _ent, int _weaponId, FireMode _mode, int &_cur, int &_max )
+	obResult GetCurrentAmmo( const GameEntity ent, int weaponId, FireMode mode, int &cur, int &max )
 	{
-		_cur = 0;
-		_max = 0;
+		cur = max = 0;
 
-		CBaseEntity *pEntity = EntityFromHandle( _ent );
-		CFFPlayer *pPlayer = ToFFPlayer( pEntity );
-		if ( pPlayer )
+		CBaseEntity * entity = EntityFromHandle( ent );
+		CFFPlayer * player = ToFFPlayer( entity );
+		if ( player )
 		{
-			const char *weaponClass = obUtilGetStringFromWeaponId( _weaponId );
-			if ( weaponClass )
+			if ( weaponId == TF_WP_PRIMARY || weaponId == TF_WP_SECONDARY )
 			{
-				CBaseCombatWeapon *pWpn = pPlayer->Weapon_OwnsThisType( weaponClass );
-				if ( pWpn )
-				{
-					//const int iAmmoType = GetAmmoDef()->Index( _mode==Primary?pWpn->GetPrimaryAmmoType():pWpn->GetSecondaryAmmoType());
+				CBaseCombatWeapon * pri = NULL;
+				CBaseCombatWeapon * sec = NULL;
+				player->GetWeaponsByWeight( pri, sec );
 
-					_cur = pPlayer->GetAmmoCount( _mode == Primary ? pWpn->GetPrimaryAmmoType() : pWpn->GetSecondaryAmmoType() );
-					//_cur = _mode==Primary?pWpn->GetPrimaryAmmoCount():pWpn->GetSecondaryAmmoCount();
-					_max = GetAmmoDef()->MaxCarry( _mode == Primary ? pWpn->GetPrimaryAmmoType() : pWpn->GetSecondaryAmmoType() );
+				CBaseCombatWeapon * wpn = ( weaponId == TF_WP_PRIMARY ) ? pri : sec;
+				if ( wpn )
+				{
+					cur = player->GetAmmoCount( mode == Primary ? wpn->GetPrimaryAmmoType() : wpn->GetSecondaryAmmoType() );
+					max = GetAmmoDef()->MaxCarry( mode == Primary ? wpn->GetPrimaryAmmoType() : wpn->GetSecondaryAmmoType() );
+				}	
+			}
+			else
+			{
+				const char *weaponClass = obUtilGetStringFromWeaponId( weaponId );
+				if ( weaponClass )
+				{
+					WEAPON_FILE_INFO_HANDLE	wpnInfoHndl = LookupWeaponInfoSlot( weaponClass );
+					if ( wpnInfoHndl != GetInvalidWeaponInfoHandle() )
+					{
+						FileWeaponInfo_t * wpnInfo = GetFileWeaponInfoFromHandle( wpnInfoHndl );					
+						cur = player->GetAmmoCount( mode == Primary ? wpnInfo->iAmmoType : wpnInfo->iAmmo2Type );
+						max = GetAmmoDef()->MaxCarry( mode == Primary ? wpnInfo->iAmmoType : wpnInfo->iAmmo2Type );
+					}
 				}
 			}
 			return Success;
 		}
-
-		_cur = 0;
-		_max = 0;
-
 		return InvalidEntity;
 	}
 
@@ -2334,12 +2326,6 @@ public:
 					_feature[ iNumFeatures ].mEntityInfo.mGroup = ENT_GRP_LADDER;
 				}
 			}
-			else if ( FClassnameIs( pEnt, "info_ff_script" ) )
-			{
-				CFFInfoScript *pInfo = dynamic_cast<CFFInfoScript*>( pEnt );
-				if ( pInfo->GetBotGoalType() == omnibot_interface::kTrainerSpawn )
-					_feature[ iNumFeatures ].mEntityInfo.mGroup = ENT_GRP_PLAYERSTART;
-			}
 
 			if ( _feature[ iNumFeatures ].mEntityInfo.mGroup != 0 )
 			{
@@ -2443,10 +2429,10 @@ class OmnibotEntityListener : public IEntityListener
 {
 	virtual void OnEntityCreated( CBaseEntity *pEntity )
 	{
+		Bot_Event_EntityCreated( pEntity );
 	}
 	virtual void OnEntitySpawned( CBaseEntity *pEntity )
 	{
-		Bot_Event_EntityCreated( pEntity );
 	}
 	virtual void OnEntityDeleted( CBaseEntity *pEntity )
 	{
@@ -3403,85 +3389,6 @@ void omnibot_interface::Notify_Sound( CBaseEntity *_source, int _sndtype, const 
 
 //////////////////////////////////////////////////////////////////////////
 
-void omnibot_interface::Notify_GoalInfo( CBaseEntity *_entity, int _type, int _teamflags )
-{
-	//BotGoalInfo gi;
-
-	////////////////////////////////////////////////////////////////////////////
-	//const int iAllTeams = ( 1 << TF_TEAM_BLUE ) | ( 1 << TF_TEAM_RED ) | ( 1 << TF_TEAM_YELLOW ) | ( 1 << TF_TEAM_GREEN );
-	//gi.mGoalTeam = _teamflags;
-	////////////////////////////////////////////////////////////////////////////
-
-	//if ( gi.mGoalTeam != 0 || _type == kTrainerSpawn )
-	//{
-	//	gi.mEntity = _entity->edict();
-	//	const char *pName = _entity->GetName();
-	//	Q_strncpy( gi.mGoalName, pName ? pName : "", sizeof( gi.mGoalName ) );
-
-	//	switch ( _type )
-	//	{
-	//	case kBackPack_Grenades:
-	//		{
-	//			//Bot_Queue_EntityCreated( _entity );
-	//			return;
-	//		}
-	//	case kBackPack_Health:
-	//		{
-	//			//Bot_Queue_EntityCreated( _entity );
-	//			return;
-	//		}
-	//	case kBackPack_Armor:
-	//		{
-	//			//Bot_Queue_EntityCreated( _entity );
-	//			return;
-	//		}
-	//	case kBackPack_Ammo:
-	//		{
-	//			//Bot_Queue_EntityCreated( _entity );
-	//			return;
-	//		}
-	//	case kFlag:
-	//		{
-	//			Q_strncpy(gi.mGoalType,"flag",sizeof(gi.mGoalType));
-	//			break;
-	//		}
-	//	case kFlagCap:
-	//		{
-	//			gi.mGoalTeam ^= iAllTeams;
-	//			Q_strncpy(gi.mGoalType,"flagcap",sizeof(gi.mGoalType));
-	//			break;
-	//		}
-	//	case kTrainerSpawn:
-	//		{
-	//			Q_strncpy(gi.mGoalType,"trainerspawn",sizeof(gi.mGoalType));
-	//			break;
-	//		}
-	//	case kHuntedEscape:
-	//		{
-	//			Q_strncpy(gi.mGoalType,"huntedescape",sizeof(gi.mGoalType));
-	//			break;
-	//		}
-	//	default:
-	//		return;
-	//	}
-
-	//	if ( gDeferredGoalIndex < MAX_DEFERRED_GOALS - 1 )
-	//	{
-	//		gDeferredGoals[ gDeferredGoalIndex++ ] = gi;
-	//	}
-	//	else
-	//	{
-	//		gGameFunctions->PrintError( "Omni-bot: Out of deferred goal slots!" );
-	//	}
-	//}
-	//else
-	//{
-	//	gGameFunctions->PrintError( "Invalid Goal Entity" );
-	//}
-}
-
-//////////////////////////////////////////////////////////////////////////
-
 void omnibot_interface::Notify_ItemRemove( CBaseEntity *_entity )
 {
 	if ( !IsOmnibotLoaded() )
@@ -3572,6 +3479,71 @@ void omnibot_interface::SendBotSignal( const char *_signal )
 	memset( &d, 0, sizeof( d ) );
 	Q_strncpy( d.mSignalName, _signal, sizeof( d.mSignalName ) );
 	gBotFunctions->SendGlobalEvent( MessageHelper( GAME_SCRIPTSIGNAL, &d, sizeof( d ) ) );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+void omnibot_interface::ParseEntityInfo( EntityInfo& entInfo, const luabind::adl::object& table )
+{
+	if(table.is_valid() && (luabind::type(table) == LUA_TTABLE))
+	{
+		for(luabind::iterator ib(table), ie; ib != ie; ++ib)
+		{
+			luabind::adl::object key = ib.key();
+			luabind::adl::object val = (*ib);
+
+			try
+			{
+				if(luabind::type(key) == LUA_TSTRING)
+				{
+					const std::string keystr = luabind::object_cast<const char *>( key );
+
+					TF_Weapon ammoWeapon = TF_WP_NONE;
+
+					if ( keystr == "group" )
+						entInfo.mGroup = (EntityGroup)luabind::object_cast<int>( val );
+					else if ( keystr == "level" )
+						entInfo.mLevel = luabind::object_cast<int>( val );
+					else if ( keystr == "health" )
+						entInfo.mHealth.mNum = luabind::object_cast<int>( val );
+					else if ( keystr == "armor" )
+						entInfo.mArmor.mNum = luabind::object_cast<int>( val );
+					else if ( keystr == "energy" )
+						entInfo.mEnergy.mNum = luabind::object_cast<int>( val );
+					else if ( keystr == "shells" )
+						ammoWeapon = TF_WP_SHOTGUN;
+					else if ( keystr == "nails" )
+						ammoWeapon = TF_WP_NAILGUN;
+					else if ( keystr == "rockets" )
+						ammoWeapon = TF_WP_ROCKET_LAUNCHER;
+					else if ( keystr == "cells" )
+						ammoWeapon = TF_WP_FLAMETHROWER;
+
+					if ( ammoWeapon != TF_WP_NONE )
+					{
+						int freeslot = -1;
+						for ( int i = 0; i < EntityInfo::NUM_AMMO_TYPES; ++i )
+						{
+							if ( freeslot == -1 && entInfo.mAmmo[ i ].mWeaponId == 0 )
+								freeslot = i;
+							else if ( entInfo.mAmmo[ i ].mWeaponId == ammoWeapon )
+							{
+								entInfo.mAmmo[ i ].mNum = luabind::object_cast<int>( val );
+								freeslot = -2; // denotes it has been set
+							}
+						}
+
+						if ( freeslot >= 0 )
+							entInfo.mAmmo[ freeslot ].Set( luabind::object_cast<int>( val ), ammoWeapon );
+					}
+				}
+			}
+			catch( const std::exception& ex )
+			{
+				_scriptman.LuaWarning( ex.what() );
+			}
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
